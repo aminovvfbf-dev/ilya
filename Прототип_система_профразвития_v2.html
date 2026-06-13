@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Единая система профразвития ГГС — прототип</title>
+<style>
+  :root{
+    --red:#C80E3F; --red-d:#A50B33; --navy:#1F3864; --navy-l:#2E4F86;
+    --grey:#7F8189; --ink:#242423; --line:#E3E5E9; --bg:#F4F5F7;
+    --card:#FFFFFF; --ok:#1F8A4C; --warn:#C8770E; --bad:#C0392B; --soft:#EDEEF1;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1060px;margin:0 auto;padding:0 20px 70px}
+
+  /* top bar */
+  .top{background:var(--red);color:#fff;padding:13px 0}
+  .top .wrap{display:flex;align-items:center;gap:14px;padding-bottom:0}
+  .mark{width:34px;height:34px;border:2px solid #fff;border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;letter-spacing:.5px;flex:none}
+  .top h1{font-size:14.5px;font-weight:700}
+  .top .sub{font-size:11px;opacity:.85;font-weight:500}
+  .demo{margin-left:auto;display:flex;gap:10px;align-items:center}
+  .demobtn{appearance:none;border:1px solid rgba(255,255,255,.6);background:rgba(255,255,255,.12);color:#fff;font:inherit;font-weight:600;font-size:12px;padding:7px 14px;border-radius:8px;cursor:pointer}
+  .demobtn:hover{background:rgba(255,255,255,.22)}
+  .badge{font-size:10px;text-transform:uppercase;letter-spacing:1px;border:1px solid rgba(255,255,255,.5);padding:4px 9px;border-radius:20px}
+
+  /* role switch */
+  .roles{display:flex;gap:8px;margin-top:20px}
+  .role{appearance:none;border:1.5px solid var(--line);background:#fff;cursor:pointer;font:inherit;padding:13px 18px;border-radius:11px;text-align:left;flex:1;transition:.15s}
+  .role:hover{border-color:var(--navy)}
+  .role[aria-pressed="true"]{border-color:var(--red);box-shadow:0 0 0 3px rgba(200,14,63,.1)}
+  .role .rt{font-weight:700;font-size:13.5px;color:var(--navy)}
+  .role[aria-pressed="true"] .rt{color:var(--red)}
+  .role .rd{font-size:11px;color:var(--grey);margin-top:2px}
+  .role:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+
+  .view{display:none;animation:fade .25s ease}
+  .view.on{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px;margin-top:18px}
+  .eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:1.4px;color:var(--red);font-weight:700;margin-bottom:7px}
+  .card h2{font-size:17px;font-weight:700;margin-bottom:3px}
+  .card .hint{color:var(--grey);font-size:12.5px;margin-bottom:6px}
+
+  /* employee header */
+  .emp{display:flex;align-items:center;gap:16px;padding-bottom:18px;border-bottom:1px solid var(--line);margin-bottom:18px}
+  .ava{width:54px;height:54px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;flex:none}
+  .emp .en{font-weight:700;font-size:16px}
+  .emp .ep{font-size:12.5px;color:var(--grey)}
+  .emp .chips{display:flex;gap:7px;margin-top:6px;flex-wrap:wrap}
+  .chip{font-size:11px;background:var(--soft);color:var(--navy);padding:4px 10px;border-radius:20px;font-weight:600}
+  .chip.cat{background:var(--navy);color:#fff}
+
+  /* roadmap timeline */
+  .rmhdr{font-size:12px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.6px;margin:4px 0 14px}
+  .road{position:relative;padding-left:34px}
+  .road::before{content:"";position:absolute;left:13px;top:6px;bottom:6px;width:2px;background:var(--line)}
+  .step{position:relative;padding:0 0 20px}
+  .step:last-child{padding-bottom:0}
+  .dot{position:absolute;left:-34px;top:1px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex:none;z-index:1}
+  .dot.done{background:var(--ok)}
+  .dot.now{background:var(--red);box-shadow:0 0 0 4px rgba(200,14,63,.15)}
+  .dot.next{background:#fff;border:2px solid var(--grey);color:var(--grey)}
+  .sttitle{font-weight:700;font-size:14px}
+  .stmeta{font-size:11.5px;color:var(--grey);margin-top:2px}
+  .sttag{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:6px;margin-top:7px;text-transform:uppercase;letter-spacing:.4px}
+  .tg-done{background:#E4F3EA;color:var(--ok)}
+  .tg-now{background:#FCE6EC;color:var(--red)}
+  .tg-next{background:var(--soft);color:var(--grey)}
+  .stbody{background:var(--soft);border-radius:9px;padding:11px 13px;margin-top:9px;font-size:12.5px}
+  .stbody .row2{display:flex;justify-content:space-between;gap:12px;margin-top:5px}
+  .stbody .lbl{color:var(--grey)}
+  .stbody .val{font-weight:700}
+  .val.up{color:var(--ok)} .val.flat{color:var(--warn)}
+  .applied{font-size:11.5px;font-weight:700}
+  .applied.yes{color:var(--ok)} .applied.part{color:var(--warn)} .applied.no{color:var(--bad)}
+
+  /* career link box */
+  .career{margin-top:18px;background:linear-gradient(180deg,#fff,#fafbfc);border:1.5px solid var(--line);border-radius:11px;padding:16px 18px}
+  .career h4{font-size:13px;color:var(--navy);margin-bottom:8px}
+  .creadi{display:flex;align-items:center;gap:12px}
+  .cgauge{flex:1;height:10px;background:var(--soft);border-radius:6px;overflow:hidden;position:relative}
+  .cgauge .fill{position:absolute;left:0;top:0;height:100%;background:var(--red);border-radius:6px;transition:width .8s}
+  .cpct{font-weight:800;font-size:18px;color:var(--red);min-width:54px;text-align:right}
+  .cnote{font-size:11.5px;color:var(--grey);margin-top:9px}
+
+  .note{font-size:11px;color:var(--grey);margin-top:16px;line-height:1.5;border-top:1px solid var(--line);padding-top:12px}
+  .stub{padding:50px 20px;text-align:center;color:var(--grey);font-size:13px}
+
+  /* subtabs */
+  .subtabs{display:flex;gap:2px;margin-top:18px;border-bottom:2px solid var(--line)}
+  .subtab{appearance:none;border:none;background:none;cursor:pointer;font:inherit;padding:11px 20px;font-weight:600;color:var(--grey);position:relative}
+  .subtab[aria-selected="true"]{color:var(--red)}
+  .subtab[aria-selected="true"]::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:3px;background:var(--red);border-radius:3px}
+  .subview{display:none}.subview.on{display:block;animation:fade .2s ease}
+
+  label.fld{display:block;font-size:12px;font-weight:600;color:var(--navy);margin:0 0 6px}
+  select,input[type=number]{width:100%;font:inherit;padding:10px 12px;border:1.5px solid var(--line);border-radius:9px;background:#fff;color:var(--ink)}
+  select:focus,input:focus{outline:none;border-color:var(--navy)}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .comp{margin-top:16px}
+  .scorehdr{display:grid;grid-template-columns:1fr 92px 92px;gap:12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--grey);font-weight:700;padding-bottom:2px}
+  .scorehdr span{text-align:center}.scorehdr span:first-child{text-align:left}
+  .crow{display:grid;grid-template-columns:1fr 92px 92px;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+  .cname{font-weight:600;font-size:13.5px}.csrc{font-size:11px;color:var(--grey);font-weight:500}
+  .num{font:inherit;width:100%;padding:7px 8px;text-align:center;border:1.5px solid var(--line);border-radius:8px}
+  .btn{appearance:none;border:none;cursor:pointer;font:inherit;font-weight:700;border-radius:10px;padding:12px 22px;background:var(--red);color:#fff;transition:.15s}
+  .btn:hover{background:var(--red-d)}
+  .btn.sec{background:#fff;color:var(--navy);border:1.5px solid var(--line)}
+  .btn.sec:hover{border-color:var(--navy)}
+  .actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  .result{margin-top:18px;display:none}.result.on{display:block}
+  .verdict{display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:11px;color:#fff;background:var(--navy)}
+  .verdict .big{font-size:34px;font-weight:800;line-height:1}.verdict .vt{font-size:13px;font-weight:600}
+  .verdict.good{background:var(--ok)}.verdict.mid{background:var(--warn)}
+  .delta{margin-top:14px}
+  .drow{padding:11px 0;border-top:1px solid var(--line)}.drow:first-child{border-top:none}
+  .dtop{display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:7px}
+  .dtop .pct{font-weight:800}.dtop .pct.up{color:var(--ok)}.dtop .pct.flat{color:var(--warn)}
+  .bar{position:relative;height:9px;background:var(--soft);border-radius:6px;overflow:hidden}
+  .bar .in{position:absolute;top:0;left:0;height:100%;background:#C6C9D2;border-radius:6px}
+  .bar .out{position:absolute;top:0;left:0;height:100%;background:var(--red);border-radius:6px;transition:width .7s}
+  .barleg{display:flex;gap:16px;font-size:10.5px;color:var(--grey);margin-top:8px}
+  .barleg b{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px}
+  .followup{margin-top:18px;background:var(--soft);border-radius:11px;padding:16px 18px}
+  .followup h4{font-size:13px;color:var(--navy);margin-bottom:4px}.followup p{font-size:12px;color:var(--grey);margin-bottom:12px}
+  .seg{display:flex;gap:8px}
+  .segbtn{flex:1;appearance:none;border:1.5px solid var(--line);background:#fff;cursor:pointer;font:inherit;font-weight:600;font-size:12.5px;padding:10px;border-radius:9px;color:var(--ink)}
+  .segbtn[aria-pressed="true"]{border-color:var(--navy);background:var(--navy);color:#fff}
+  .ai{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;background:var(--soft);color:var(--navy);padding:3px 9px;border-radius:6px;margin-left:8px}
+  .seg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:6px}
+  .cat{appearance:none;border:1.5px solid var(--line);background:#fff;cursor:pointer;font:inherit;text-align:left;padding:14px;border-radius:11px;transition:.15s}
+  .cat:hover{border-color:var(--navy)}
+  .cat[aria-pressed="true"]{border-color:var(--red);box-shadow:0 0 0 3px rgba(200,14,63,.12)}
+  .cat .t{font-weight:700;font-size:14px;color:var(--navy)}.cat .d{font-size:11.5px;color:var(--grey);margin-top:3px}
+  .defs{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+  .def{appearance:none;border:1.5px solid var(--line);background:#fff;cursor:pointer;font:inherit;font-size:12.5px;font-weight:600;padding:8px 13px;border-radius:20px;color:var(--ink)}
+  .def[aria-pressed="true"]{border-color:var(--red);background:var(--red);color:#fff}
+  .traj{margin-top:18px;display:none}.traj.on{display:block}
+  .tname{font-size:17px;font-weight:800;color:var(--red);margin-bottom:2px}
+  .tdesc{font-size:12.5px;color:var(--grey);margin-bottom:14px}
+  .prog{display:flex;gap:13px;padding:13px 0;border-top:1px solid var(--line);align-items:flex-start}
+  .prog:first-of-type{border-top:none}
+  .pnum{width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex:none;margin-top:1px}
+  .pbody .pt{font-weight:700;font-size:13.5px}.pbody .pm{font-size:11.5px;color:var(--grey);margin-top:2px}
+  .pbody .why{font-size:11.5px;color:var(--navy);margin-top:3px;font-weight:600}
+
+  /* analytics */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:6px}
+  .kpi{background:var(--soft);border-radius:11px;padding:15px 16px}
+  .kpi .kn{font-size:30px;font-weight:800;color:var(--navy);line-height:1}
+  .kpi .kl{font-size:11px;color:var(--grey);margin-top:5px;font-weight:600}
+  .kpi.warn .kn{color:var(--warn)} .kpi.bad .kn{color:var(--bad)}
+  .bhdr{display:flex;align-items:baseline;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+  .bhdr h3{font-size:15px;font-weight:700}
+  .bsub{font-size:11.5px;color:var(--grey)}
+  /* ranking */
+  .rk{display:grid;grid-template-columns:1fr 56px;gap:12px;align-items:center;padding:9px 0}
+  .rkname{font-size:12.5px;font-weight:600}
+  .rkmeta{font-size:10.5px;color:var(--grey)}
+  .rkbar{height:22px;background:var(--soft);border-radius:6px;overflow:hidden;margin-top:5px;position:relative}
+  .rkbar .f{height:100%;border-radius:6px;transition:width .8s}
+  .rkbar .f.hi{background:var(--ok)} .rkbar .f.mid{background:var(--warn)} .rkbar .f.lo{background:var(--bad)}
+  .rkval{font-size:17px;font-weight:800;text-align:right}
+  .rkval.hi{color:var(--ok)} .rkval.mid{color:var(--warn)} .rkval.lo{color:var(--bad)}
+  .rkflag{display:inline-block;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;padding:2px 7px;border-radius:5px;margin-left:7px;background:#FBE3E1;color:var(--bad)}
+  /* gap bars */
+  .gaprow{padding:11px 0;border-top:1px solid var(--line)}.gaprow:first-child{border-top:none}
+  .gapname{font-size:12.5px;font-weight:600;margin-bottom:7px}
+  .gapbars{display:flex;align-items:center;gap:10px}
+  .gb{flex:1;height:26px;background:var(--soft);border-radius:6px;position:relative;overflow:hidden}
+  .gb .seg1{position:absolute;left:0;top:0;height:100%;background:#C6C9D2;border-radius:6px}
+  .gb .seg2{position:absolute;left:0;top:0;height:100%;background:var(--red);border-radius:6px;transition:width .8s}
+  .gb .lab{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;color:var(--ink)}
+  .gnum{min-width:90px;text-align:right;font-size:12px}
+  .gnum .gd{font-weight:800;color:var(--bad)}
+  .gaplg{display:flex;gap:18px;font-size:10.5px;color:var(--grey);margin-top:10px}
+  .gaplg b{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:middle}
+  /* career compare */
+  .careerwrap{display:flex;align-items:stretch;gap:16px}
+  .ccol{flex:1;background:var(--soft);border-radius:12px;padding:18px;text-align:center}
+  .cyear{font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--grey);font-weight:700}
+  .cbignum{font-size:46px;font-weight:800;line-height:1.1;margin:6px 0}
+  .cbignum.bad{color:var(--bad)} .cbignum.ok{color:var(--ok)}
+  .cdesc{font-size:11.5px;color:var(--grey);line-height:1.45}
+  .carrow{display:flex;align-items:center;font-size:30px;color:var(--red);font-weight:800}
+  @media(max-width:680px){.kpis{grid-template-columns:repeat(2,1fr)}.careerwrap{flex-direction:column}.carrow{transform:rotate(90deg)}}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="wrap">
+    <div class="mark">ГГС</div>
+    <div>
+      <h1>Единая система профессионального развития ГГС Санкт-Петербурга</h1>
+      <div class="sub">Прототип · сквозной цикл: служащий → оператор → аналитика</div>
+    </div>
+    <div class="demo">
+      <button class="demobtn" onclick="demoMode()">▶ Демо-режим</button>
+      <span class="badge">макет</span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="roles" role="tablist">
+    <button class="role" aria-pressed="true" id="r-emp" onclick="role('emp')">
+      <div class="rt">Служащий</div><div class="rd">моя траектория развития</div></button>
+    <button class="role" aria-pressed="false" id="r-op" onclick="role('op')">
+      <div class="rt">Оператор · паспорт и конструктор</div><div class="rd">оценка программы, подбор траектории</div></button>
+    <button class="role" aria-pressed="false" id="r-head" onclick="role('head')">
+      <div class="rt">Руководитель Корпоративного университета</div><div class="rd">аналитика по всей системе</div></button>
+  </div>
+
+  <!-- ============ VIEW: EMPLOYEE ============ -->
+  <section class="view on" id="v-emp">
+    <div class="card">
+      <div class="eyebrow">Личный кабинет служащего · направление 2</div>
+      <div class="emp">
+        <div class="ava">КА</div>
+        <div>
+          <div class="en">Ковалёва Анна Сергеевна</div>
+          <div class="ep">Главный специалист · Администрация Выборгского района</div>
+          <div class="chips">
+            <span class="chip cat">Категория: специалисты</span>
+            <span class="chip">Профиль: контрактная система</span>
+            <span class="chip">Траектория: профессионально-предметная</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="rmhdr">Моя образовательная траектория</div>
+      <div class="road" id="road"></div>
+
+      <div class="career">
+        <h4>Готовность к должностному росту</h4>
+        <div class="creadi">
+          <div class="cgauge"><div class="fill" id="cfill" style="width:0%"></div></div>
+          <div class="cpct" id="cpct">—</div>
+        </div>
+        <div class="cnote" id="cnote">Показатель собирается из подтверждённого прироста компетенций и применения их в работе — в отличие от нынешней системы, где учитывается только факт прохождения.</div>
+      </div>
+
+      <p class="note">Траектория формируется по категории должности и выявленным дефицитам (Справочник Минтруда). Связь обучения с карьерой делает наглядной то, что в действующей системе не фиксируется: за рассматриваемый период должностной рост после ДПО был нулевым. Основание — ст. 62 ФЗ-79, Закон Санкт-Петербурга № 769-163.</p>
+    </div>
+  </section>
+
+  <!-- ============ VIEW: OPERATOR ============ -->
+  <section class="view" id="v-op">
+    <div class="subtabs">
+      <button class="subtab" aria-selected="true" id="st-pass" onclick="sub('pass')">Паспорт результатов программы</button>
+      <button class="subtab" aria-selected="false" id="st-cons" onclick="sub('cons')">Конструктор траектории</button>
+    </div>
+
+    <!-- passport -->
+    <div class="subview on" id="sv-pass">
+      <div class="card">
+        <div class="eyebrow">Направление 1 · замыкание управленческого цикла</div>
+        <h2>Паспорт результатов программы ДПО</h2>
+        <p class="hint">Программа связывается с измеримыми компетенциями Справочника Минтруда. Входной и итоговый замер фиксируют прирост, а не факт прохождения.</p>
+        <label class="fld" for="prog">Программа обучения</label>
+        <select id="prog" onchange="loadProg()"></select>
+        <div class="meta" id="meta"></div>
+        <div class="comp">
+          <div class="scorehdr"><span>Компетенция (0–100)</span><span>Вход</span><span>Итог</span></div>
+          <div id="comps"></div>
+        </div>
+        <div class="actions">
+          <button class="btn" onclick="calcPassport()">Рассчитать результат</button>
+          <button class="btn sec" onclick="demoFill()">Заполнить демо-данными</button>
+        </div>
+        <div class="result" id="res1">
+          <div class="verdict" id="verdict">
+            <div class="big" id="vbig">—</div>
+            <div><div class="vt" id="vtitle"></div><div class="vt" id="vsub" style="opacity:.82;font-weight:500"></div></div>
+          </div>
+          <div class="delta" id="delta"></div>
+          <div class="followup">
+            <h4>Отложенная оценка применения (через 3–6 мес.)</h4>
+            <p>Подтверждение непосредственного руководителя: применяются ли компетенции в работе?</p>
+            <div class="seg">
+              <button class="segbtn" aria-pressed="false" onclick="follow(this)">Да, применяет</button>
+              <button class="segbtn" aria-pressed="false" onclick="follow(this)">Частично</button>
+              <button class="segbtn" aria-pressed="false" onclick="follow(this)">Пока нет</button>
+            </div>
+          </div>
+          <p class="note">Данные входят в аналитический модуль портала и используются как информационный материал для индивидуального плана развития и подготовки к аттестации. Процедура аттестации (Указ Президента РФ № 110) не изменяется. Основание — ст. 62 ФЗ-79, Закон Санкт-Петербурга № 769-163.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- constructor -->
+    <div class="subview" id="sv-cons">
+      <div class="card">
+        <div class="eyebrow">Направление 2 · дифференцированные траектории <span class="ai">логика по правилам</span></div>
+        <h2>Конструктор образовательной траектории</h2>
+        <p class="hint">Подбор по правилам: категория должности (Справочник) + выявленные дефициты → набор программ. Не нейросеть и не автоматическое кадровое решение — вспомогательная рекомендация.</p>
+        <label class="fld">1. Категория должности</label>
+        <div class="seg3" id="cats"></div>
+        <label class="fld" style="margin-top:18px">2. Выявленные дефициты компетенций</label>
+        <div class="defs" id="defs"></div>
+        <div class="actions">
+          <button class="btn" onclick="buildTraj()">Подобрать траекторию</button>
+          <button class="btn sec" onclick="resetTraj()">Сбросить</button>
+        </div>
+        <div class="traj" id="trajOut">
+          <div class="tname" id="tname"></div>
+          <div class="tdesc" id="tdesc"></div>
+          <div id="progs"></div>
+          <p class="note" id="tnote"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW: HEAD — ANALYTICS ============ -->
+  <section class="view" id="v-head">
+    <div class="card">
+      <div class="eyebrow">Аналитический модуль · поддержка решений Корпоративного университета</div>
+      <h2>Аналитика системы профессионального развития</h2>
+      <p class="hint">То, чего не показывает действующий учёт: не сколько обучено, а что обучение дало. Основание для решений о пересмотре программ и приоритетах.</p>
+
+      <div class="kpis">
+        <div class="kpi"><div class="kn" id="k1">—</div><div class="kl">программ в линейке</div></div>
+        <div class="kpi"><div class="kn" id="k2">—</div><div class="kl">средний прирост, балл</div></div>
+        <div class="kpi warn"><div class="kn" id="k3">—</div><div class="kl">разрыв «прошли → применяют»</div></div>
+        <div class="kpi bad"><div class="kn" id="k4">—</div><div class="kl">программ под пересмотр</div></div>
+      </div>
+    </div>
+
+    <!-- block 1: program ranking -->
+    <div class="card">
+      <div class="bhdr"><h3>1. Рейтинг программ по приросту компетенций</h3>
+        <span class="bsub">какие программы работают, а какие — под пересмотр</span></div>
+      <div id="rank"></div>
+      <p class="note">Прирост = средняя разница итогового и входного замера по компетенциям программы (данные паспортов результатов). Программы с приростом ниже порога — кандидаты на пересмотр содержания или смену оператора.</p>
+    </div>
+
+    <!-- block 2: passed vs applied -->
+    <div class="card">
+      <div class="bhdr"><h3>2. Разрыв «прошли обучение» → «применяют в работе»</h3>
+        <span class="bsub">по отложенной оценке руководителей через 3–6 мес.</span></div>
+      <div id="gap"></div>
+      <p class="note">В действующей системе фиксируется только левый столбец — факт прохождения. Правый столбец (применение) появляется только при замкнутом цикле оценки. Разрыв между ними — скрытая неэффективность, которую сейчас не видно.</p>
+    </div>
+
+    <!-- block 3: training -> career -->
+    <div class="card">
+      <div class="bhdr"><h3>3. Связь обучения и должностного роста</h3>
+        <span class="bsub">доля прошедших ДПО, получивших назначение в порядке роста</span></div>
+      <div class="careerwrap">
+        <div class="ccol">
+          <div class="cyear">Действующая система</div>
+          <div class="cbignum bad" id="cnow">0%</div>
+          <div class="cdesc">За рассматриваемый период — ноль назначений после ДПО. Связь обучения и карьеры не фиксируется.</div>
+        </div>
+        <div class="carrow">→</div>
+        <div class="ccol">
+          <div class="cyear">С системой оценки</div>
+          <div class="cbignum ok" id="cnew">—</div>
+          <div class="cdesc">Подтверждённый прирост + применение становятся основанием для включения в кадровый резерв и должностного роста.</div>
+        </div>
+      </div>
+      <p class="note">Прототип не гарантирует рост сам по себе, но впервые делает обучение измеримым фактором кадровых решений — устраняя «нулевую» связь, выявленную в анализе.</p>
+    </div>
+  </section>
+</div>
+
+<script>
+/* ---------- employee roadmap data ---------- */
+const ROAD = [
+  {st:"done",title:"Противодействие коррупции на госслужбе",meta:"16 ч · 2023 · обязательная",
+   gainIn:55,gainOut:88,applied:"yes"},
+  {st:"done",title:"Бережливые технологии в госуправлении",meta:"24 ч · 2024 · «Эффективный регион»",
+   gainIn:48,gainOut:74,applied:"part"},
+  {st:"now",title:"Работа с государственными информационными системами",meta:"24 ч · идёт сейчас · прикладной модуль",
+   gainIn:40,gainOut:null,applied:null},
+  {st:"next",title:"Анализ данных для управленческих задач",meta:"24 ч · рекомендовано · по выявленному дефициту «работа с данными»",
+   gainIn:null,gainOut:null,applied:null},
+];
+const APPLIED_TXT={yes:["применяется в работе","yes"],part:["применяется частично","part"],no:["пока не применяется","no"]};
+
+function renderRoad(showResults){
+  const box=document.getElementById('road');box.innerHTML='';
+  ROAD.forEach((s,i)=>{
+    const num = s.st==='done' ? '✓' : (i+1);
+    let body='';
+    if(s.st==='done'){
+      const gain=s.gainOut-s.gainIn;
+      const ap=APPLIED_TXT[s.applied];
+      body=`<div class="stbody">
+        <div class="row2"><span class="lbl">Прирост компетенций</span>
+          <span class="val ${gain>=15?'up':'flat'}">${gain>=0?'+':''}${showResults?gain:'—'}</span></div>
+        <div class="row2"><span class="lbl">Отложенная оценка (3–6 мес.)</span>
+          <span class="applied ${ap[1]}">${showResults?ap[0]:'—'}</span></div>
+      </div>`;
+    } else if(s.st==='now'){
+      body=`<div class="stbody"><div class="row2"><span class="lbl">Входной замер пройден</span>
+        <span class="val">${s.gainIn}</span></div>
+        <div class="row2"><span class="lbl">Итоговый замер</span><span class="val flat">ожидается</span></div></div>`;
+    } else {
+      body=`<div class="stbody"><span class="lbl">Подобрано по дефициту компетенций. После согласования с руководителем войдёт в план развития.</span></div>`;
+    }
+    const tag = s.st==='done'?'<span class="sttag tg-done">завершено</span>'
+              : s.st==='now'?'<span class="sttag tg-now">проходит сейчас</span>'
+              : '<span class="sttag tg-next">рекомендовано</span>';
+    box.insertAdjacentHTML('beforeend',
+      `<div class="step">
+        <div class="dot ${s.st}">${num}</div>
+        <div class="sttitle">${s.title}</div>
+        <div class="stmeta">${s.meta}</div>
+        ${tag}
+        ${body}
+      </div>`);
+  });
+  // career readiness gauge
+  if(showResults){
+    document.getElementById('cfill').style.width='64%';
+    document.getElementById('cpct').textContent='64%';
+    document.getElementById('cnote').textContent='Два завершённых модуля с подтверждённым приростом и применением + один в процессе. До уровня готовности к включению в кадровый резерв — рекомендованный модуль по анализу данных.';
+  } else {
+    document.getElementById('cfill').style.width='0%';
+    document.getElementById('cpct').textContent='—';
+  }
+}
+
+/* ---------- roles ---------- */
+function role(r){
+  document.getElementById('v-emp').classList.toggle('on',r==='emp');
+  document.getElementById('v-op').classList.toggle('on',r==='op');
+  document.getElementById('v-head').classList.toggle('on',r==='head');
+  document.getElementById('r-emp').setAttribute('aria-pressed',r==='emp');
+  document.getElementById('r-op').setAttribute('aria-pressed',r==='op');
+  document.getElementById('r-head').setAttribute('aria-pressed',r==='head');
+  if(r==='head'){renderHead();setTimeout(revealCareer,400);}
+}
+
+/* ---------- demo mode: один клик → кульминационный экран ---------- */
+function demoMode(){
+  role('head');
+  renderHead();
+  document.getElementById('cnew').textContent='—';
+  setTimeout(()=>{document.getElementById('cnew').textContent='12%';},500);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ---------- subtabs ---------- */
+function sub(s){
+  document.getElementById('sv-pass').classList.toggle('on',s==='pass');
+  document.getElementById('sv-cons').classList.toggle('on',s==='cons');
+  document.getElementById('st-pass').setAttribute('aria-selected',s==='pass');
+  document.getElementById('st-cons').setAttribute('aria-selected',s==='cons');
+}
+
+/* ---------- operator: PASSPORT ---------- */
+const PROGRAMS={
+  digital:{name:"Современное госуправление в условиях цифровой трансформации",hours:44,cat:"Руководители",src:"Корпоративный университет",
+    comps:[{name:"Управление на основе данных",src:"Справочник Минтруда · ИКТ"},{name:"Работа с дашбордами",src:"профессионально-функц."},{name:"Оценка цифровых решений и рисков",src:"управленческие"}]},
+  newtrack:{name:"Новая траектория (молодёжный кадровый резерв)",hours:120,cat:"Кадровый резерв",src:"Корпоративный университет",
+    comps:[{name:"Базовые управленческие компетенции",src:"управленческие"},{name:"Основы госслужбы и регламентов",src:"Справочник · базовые"},{name:"Коммуникация и работа с обращениями",src:"коммуникативные"}]},
+  lean:{name:"Бережливые технологии в госуправлении",hours:24,cat:"Специалисты",src:"проект «Эффективный регион»",
+    comps:[{name:"Оптимизация процессов",src:"профессионально-функц."},{name:"Картирование потоков",src:"аналитические"}]},
+  anticor:{name:"Противодействие коррупции на госслужбе",hours:16,cat:"Все категории",src:"обязательная",
+    comps:[{name:"Идентификация коррупционных рисков",src:"Справочник · антикор."},{name:"Урегулирование конфликта интересов",src:"ФЗ-273"}]},
+};
+const sel=document.getElementById('prog');
+Object.keys(PROGRAMS).forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=PROGRAMS[k].name;sel.appendChild(o);});
+function loadProg(){
+  const p=PROGRAMS[sel.value];
+  document.getElementById('meta').innerHTML=`<span class="chip">${p.hours} ак. ч.</span><span class="chip">${p.cat}</span><span class="chip">${p.src}</span>`;
+  const box=document.getElementById('comps');box.innerHTML='';
+  p.comps.forEach((c,i)=>box.insertAdjacentHTML('beforeend',
+    `<div class="crow"><div><div class="cname">${c.name}</div><div class="csrc">${c.src}</div></div>
+     <input class="num" type="number" min="0" max="100" id="in${i}" placeholder="0">
+     <input class="num" type="number" min="0" max="100" id="out${i}" placeholder="0"></div>`));
+  document.getElementById('res1').classList.remove('on');
+}
+function demoFill(){
+  const presets={digital:[[42,78],[35,80],[48,72]],newtrack:[[30,74],[40,82],[38,70]],lean:[[50,76],[45,71]],anticor:[[55,88],[60,90]]};
+  (presets[sel.value]||[]).forEach((v,i)=>{const a=document.getElementById('in'+i),b=document.getElementById('out'+i);if(a)a.value=v[0];if(b)b.value=v[1];});
+  calcPassport();
+}
+function calcPassport(){
+  const p=PROGRAMS[sel.value];let si=0,so=0,n=0,rows='';
+  p.comps.forEach((c,i)=>{
+    const a=+(document.getElementById('in'+i).value||0),b=+(document.getElementById('out'+i).value||0);
+    si+=a;so+=b;n++;const d=b-a;
+    rows+=`<div class="drow"><div class="dtop"><span>${c.name}</span><span class="pct ${d>=8?'up':'flat'}">${d>=0?'+':''}${d}</span></div>
+      <div class="bar"><div class="in" style="width:${a}%"></div><div class="out" style="width:${b}%"></div></div></div>`;
+  });
+  const ai=Math.round(si/n),ao=Math.round(so/n),g=ao-ai;
+  document.getElementById('delta').innerHTML=`<div style="font-size:12.5px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Прирост по компетенциям</div>${rows}
+    <div class="barleg"><span><b style="background:#C6C9D2"></b>вход (ср. ${ai})</span><span><b style="background:var(--red)"></b>итог (ср. ${ao})</span></div>`;
+  const v=document.getElementById('verdict');v.classList.remove('good','mid');let t,s;
+  if(g>=15){v.classList.add('good');t="Результат подтверждён";s="Существенный прирост — программа эффективна";}
+  else if(g>=6){v.classList.add('mid');t="Умеренный прирост";s="Рекомендуется усилить практический блок";}
+  else{t="Прирост не подтверждён";s="Сигнал для пересмотра программы или оператора";}
+  document.getElementById('vbig').textContent=(g>=0?'+':'')+g;
+  document.getElementById('vtitle').textContent=t;document.getElementById('vsub').textContent=s;
+  document.getElementById('res1').classList.add('on');
+  document.querySelectorAll('#res1 .segbtn').forEach(b=>b.setAttribute('aria-pressed','false'));
+}
+function follow(btn){document.querySelectorAll('#res1 .segbtn').forEach(b=>b.setAttribute('aria-pressed','false'));btn.setAttribute('aria-pressed','true');}
+
+/* ---------- operator: CONSTRUCTOR ---------- */
+const CATS={ruk:{t:"Руководители",d:"стратегические компетенции"},spec:{t:"Специалисты",d:"прикладные компетенции"},obesp:{t:"Обеспечивающие",d:"базовая ИКТ-грамотность"}};
+const DEFS=["Управление на основе данных","Цифровая грамотность","Работа с ГИС","Анализ данных","Информационная безопасность","Антикоррупционные","Проектное управление","Коммуникация с гражданами"];
+const TRAJ={
+  ruk:{name:"Управленческо-стратегическая траектория",desc:"Для руководителей: цифровое лидерство и решения на основе данных.",
+    base:[{t:"Современное госуправление в условиях цифровой трансформации",m:"44 ч · Корпоративный университет",why:"базовый модуль траектории"},{t:"Оценка эффективности цифровых решений",m:"16 ч · модуль",why:"базовый модуль траектории"}]},
+  spec:{name:"Профессионально-предметная траектория",desc:"Для специалистов: прикладные цифровые навыки в профильной деятельности.",
+    base:[{t:"Работа с государственными информационными системами",m:"24 ч · прикладной модуль",why:"базовый модуль траектории"},{t:"Бережливые технологии в госуправлении",m:"24 ч · «Эффективный регион»",why:"базовый модуль траектории"}]},
+  obesp:{name:"Базово-операционная траектория",desc:"Для обеспечивающих: уверенная работа в цифровой среде.",
+    base:[{t:"Базовая цифровая грамотность и документооборот",m:"16 ч · базовый модуль",why:"базовый модуль траектории"}]},
+};
+const DEFMAP={
+  "Управление на основе данных":{t:"Управление на основе данных и дашборды",m:"16 ч",cat:["ruk","spec"]},
+  "Цифровая грамотность":{t:"Цифровая грамотность государственного служащего",m:"16 ч",cat:["ruk","spec","obesp"]},
+  "Работа с ГИС":{t:"Практикум по работе в ведомственных ГИС",m:"24 ч",cat:["spec","obesp"]},
+  "Анализ данных":{t:"Анализ данных для управленческих задач",m:"24 ч",cat:["ruk","spec"]},
+  "Информационная безопасность":{t:"Информационная безопасность и кибергигиена",m:"16 ч · ФЗ-152",cat:["ruk","spec","obesp"]},
+  "Антикоррупционные":{t:"Противодействие коррупции на госслужбе",m:"16 ч · обязательная",cat:["ruk","spec","obesp"]},
+  "Проектное управление":{t:"Проектное управление в органе власти",m:"24 ч",cat:["ruk","spec"]},
+  "Коммуникация с гражданами":{t:"Работа с обращениями и публичная коммуникация",m:"16 ч",cat:["ruk","spec","obesp"]},
+};
+let curCat=null;const picked=new Set();
+const catBox=document.getElementById('cats');
+Object.keys(CATS).forEach(k=>catBox.insertAdjacentHTML('beforeend',`<button class="cat" aria-pressed="false" data-k="${k}" onclick="pickCat('${k}')"><div class="t">${CATS[k].t}</div><div class="d">${CATS[k].d}</div></button>`));
+const defBox=document.getElementById('defs');
+DEFS.forEach(d=>defBox.insertAdjacentHTML('beforeend',`<button class="def" aria-pressed="false" onclick="pickDef(this,'${d}')">${d}</button>`));
+function pickCat(k){curCat=k;document.querySelectorAll('.cat').forEach(c=>c.setAttribute('aria-pressed',c.dataset.k===k));}
+function pickDef(btn,d){if(picked.has(d)){picked.delete(d);btn.setAttribute('aria-pressed','false');}else{picked.add(d);btn.setAttribute('aria-pressed','true');}}
+function buildTraj(){
+  if(!curCat){alert('Выберите категорию должности');return;}
+  const t=TRAJ[curCat];document.getElementById('tname').textContent=t.name;document.getElementById('tdesc').textContent=t.desc;
+  let list=t.base.map(b=>({...b}));
+  picked.forEach(d=>{const m=DEFMAP[d];if(m&&m.cat.includes(curCat)&&!list.some(x=>x.t===m.t))list.push({t:m.t,m:m.m,why:"по выявленному дефициту: "+d});});
+  let html='';list.forEach((p,i)=>html+=`<div class="prog"><div class="pnum">${i+1}</div><div class="pbody"><div class="pt">${p.t}</div><div class="pm">${p.m}</div><div class="why">${p.why}</div></div></div>`);
+  document.getElementById('progs').innerHTML=html;
+  document.getElementById('tnote').textContent=`Подобрано ${list.length} программ(ы): ${t.base.length} базовых для категории «${CATS[curCat].t}» и ${list.length-t.base.length} по выявленным дефицитам. Обязательные темы сохраняются для всех. Рекомендация согласуется с представителем нанимателя.`;
+  document.getElementById('trajOut').classList.add('on');
+}
+function resetTraj(){curCat=null;picked.clear();document.querySelectorAll('.cat').forEach(c=>c.setAttribute('aria-pressed','false'));document.querySelectorAll('.def').forEach(c=>c.setAttribute('aria-pressed','false'));document.getElementById('trajOut').classList.remove('on');}
+/* ---------- HEAD: analytics ---------- */
+const ANALYTICS=[
+  {name:"Современное госуправление в цифровой трансформации",meta:"44 ч · руководители",gain:35,passed:120,applied:78},
+  {name:"Анализ данных для управленческих задач",meta:"24 ч · специалисты",gain:28,passed:64,applied:41},
+  {name:"Работа с государственными информационными системами",meta:"24 ч · специалисты",gain:22,passed:95,applied:70},
+  {name:"Бережливые технологии в госуправлении",meta:"24 ч · специалисты",gain:18,passed:88,applied:52},
+  {name:"Интенсив по языковой грамотности",meta:"16 ч · все категории",gain:9,passed:140,applied:60},
+  {name:"Противодействие коррупции на госслужбе",meta:"16 ч · обязательная",gain:5,passed:160,applied:120},
+];
+function renderHead(){
+  const n=ANALYTICS.length;
+  const avg=Math.round(ANALYTICS.reduce((s,p)=>s+p.gain,0)/n);
+  const totPass=ANALYTICS.reduce((s,p)=>s+p.passed,0);
+  const totApp=ANALYTICS.reduce((s,p)=>s+p.applied,0);
+  const gapPct=Math.round((1-totApp/totPass)*100);
+  const review=ANALYTICS.filter(p=>p.gain<10).length;
+  document.getElementById('k1').textContent=n;
+  document.getElementById('k2').textContent='+'+avg;
+  document.getElementById('k3').textContent=gapPct+'%';
+  document.getElementById('k4').textContent=review;
+  // ranking (sorted desc)
+  const sorted=[...ANALYTICS].sort((a,b)=>b.gain-a.gain);
+  const max=Math.max(...sorted.map(p=>p.gain));
+  let rk='';
+  sorted.forEach(p=>{
+    const cls=p.gain>=15?'hi':p.gain>=10?'mid':'lo';
+    const flag=p.gain<10?'<span class="rkflag">под пересмотр</span>':'';
+    rk+=`<div><div class="rk"><div>
+      <div class="rkname">${p.name}${flag}</div><div class="rkmeta">${p.meta}</div>
+      <div class="rkbar"><div class="f ${cls}" style="width:${Math.round(p.gain/max*100)}%"></div></div>
+      </div><div class="rkval ${cls}">+${p.gain}</div></div></div>`;
+  });
+  document.getElementById('rank').innerHTML=rk;
+  // gap
+  const maxPass=Math.max(...ANALYTICS.map(p=>p.passed));
+  let gp='';
+  ANALYTICS.forEach(p=>{
+    const d=p.passed-p.applied;
+    gp+=`<div class="gaprow"><div class="gapname">${p.name}</div>
+      <div class="gapbars"><div class="gb">
+        <div class="seg1" style="width:${Math.round(p.passed/maxPass*100)}%"></div>
+        <div class="seg2" style="width:${Math.round(p.applied/maxPass*100)}%"></div>
+      </div><div class="gnum">прошли ${p.passed} · <span class="gd">−${d}</span></div></div></div>`;
+  });
+  gp+=`<div class="gaplg"><span><b style="background:#C6C9D2"></b>прошли обучение</span><span><b style="background:var(--red)"></b>применяют в работе</span></div>`;
+  document.getElementById('gap').innerHTML=gp;
+  // career
+  document.getElementById('cnow').textContent='0%';
+  document.getElementById('cnew').textContent='—';
+}
+function revealCareer(){ document.getElementById('cnew').textContent='12%'; }
+
+loadProg();
+
+/* init: показываем траекторию, но без результатов до демо-режима/раскрытия */
+renderRoad(true);
+</script>
+</body>
+</html>
