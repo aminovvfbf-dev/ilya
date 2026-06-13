@@ -145,7 +145,6 @@
 <div class="wrap">
   <div class="tabs" role="tablist">
     <button class="tab" role="tab" aria-selected="true" id="t0" onclick="tab(0)">Служащие</button>
-    <button class="tab" role="tab" aria-selected="false" id="t1" onclick="tab(1)">Паспорт результатов</button>
     <button class="tab" role="tab" aria-selected="false" id="t2" onclick="tab(2)">Аналитика программ</button>
   </div>
 
@@ -171,7 +170,6 @@
           <div class="ava">ИИ</div>
           <div class="pinfo"><div class="nm">Иванов Иван Иванович</div>
             <div class="ps">Главный специалист отдела образования · 41 год · стаж госслужбы 12 лет · категория: специалисты</div></div>
-          <div style="margin-left:auto"><button class="btn sm" onclick="tab(1)">Открыть паспорт результатов →</button></div>
         </div>
         <div class="sources">
           <div class="source"><div class="sl">Профиль и кадровые данные</div><div class="sv">ЕИСУ КС (федеральный уровень)</div><div class="sd">должность, категория, стаж — по правилам межсистемного взаимодействия</div></div>
@@ -191,7 +189,7 @@
         </div>
 
         <div class="card" style="margin-top:0">
-          <div class="secttl">Индивидуальная траектория развития <span class="ai">правила + ИИ-персонализация</span></div>
+          <div class="secttl">Индивидуальный план профессионального развития <span class="ai">правила + ИИ-персонализация</span></div>
           <div id="traj0"></div>
           <div class="manual">
             <div style="font-size:12px;font-weight:700;color:var(--navy)">Добрать программу под дефицит вручную</div>
@@ -207,6 +205,7 @@
   <!-- ===== 1: ПАСПОРТ ===== -->
   <section class="panel" id="p1" role="tabpanel">
     <div class="card">
+      <button class="back" onclick="tab(0)">← К индивидуальному плану · Иванов И. И.</button>
       <h2>Паспорт результатов программы</h2>
       <p class="hint">Документ формируется системой автоматически из данных тестирования и оценки руководителя. Оценка результата — по модели Киркпатрика: у каждого уровня свой источник данных.</p>
       <label class="fld" for="prog">Служащий: Иванов И. И. · программа:</label>
@@ -262,7 +261,13 @@
 </div>
 
 <script>
-function tab(n){[0,1,2].forEach(i=>{document.getElementById('p'+i).classList.toggle('on',i===n);document.getElementById('t'+i).setAttribute('aria-selected',i===n);});if(n===0)showCard();}
+function tab(n){[0,1,2].forEach(i=>{document.getElementById('p'+i).classList.toggle('on',i===n);const t=document.getElementById('t'+i);if(t)t.setAttribute('aria-selected',i===n);});}
+function openPassport(key){
+  document.getElementById('prog').value=key;
+  render();
+  tab(1);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
 
 /* ---- список ---- */
 const EMP=[
@@ -308,8 +313,8 @@ function drawRadar(){
 
 /* ---- траектория ---- */
 const TRACK=[
-  {t:"Противодействие коррупции на госслужбе",m:"16 ч · 2024 · обязательная",status:"done"},
-  {t:"Применение бережливых технологий в госуправлении",m:"24 ч · 2024 · «Эффективный регион»",status:"done"},
+  {t:"Противодействие коррупции на госслужбе",m:"16 ч · 2024 · обязательная",status:"done",pp:"anticor"},
+  {t:"Применение бережливых технологий в госуправлении",m:"24 ч · 2024 · «Эффективный регион»",status:"done",pp:"lean"},
   {t:"Современное госуправление в условиях цифровой трансформации",m:"44 ч · с 09.2025 · в процессе",status:"prog"},
   {t:"Практикум по работе в ведомственных ГИС",m:"24 ч · рекомендовано",status:"rec",src:"дефицит «Работа с ГИС» −27",ai:true},
   {t:"Анализ данных для управленческих задач",m:"24 ч · рекомендовано",status:"rec",src:"дефицит «Анализ данных» −20",ai:true},
@@ -322,7 +327,8 @@ function renderTrack(){
     let lab=s.status==="done"?'<span class="stat done">Пройдено</span>':s.status==="prog"?'<span class="stat prog">В процессе</span>':(approved[i]?'<span class="stat appr">✓ Согласовано руководителем · в плане</span>':'<span class="stat rec">Рекомендовано · ожидает согласования руководителя</span>');
     let aitag=s.ai?'<span class="aitag">приоритет уточнён ИИ-персонализацией</span>':'';
     let rec=s.status==="rec"?`<div class="recact"><span class="recsrc">основание: ${s.src}</span>${approved[i]?'':`<button class="btn sm" onclick="approve(${i})">Направить на согласование</button>`}</div>${aitag}`:"";
-    box.insertAdjacentHTML('beforeend',`<div class="step"><div class="dot ${cls}">${approved[i]?'✓':icon}</div><div class="sbody"><div class="st">${s.t}</div><div class="sm">${s.m}</div>${lab}${rec}</div></div>`);
+    let pass=s.status==="done"?`<div class="recact"><button class="btn sm" onclick="openPassport('${s.pp}')">Паспорт результатов →</button></div>`:"";
+    box.insertAdjacentHTML('beforeend',`<div class="step"><div class="dot ${cls}">${approved[i]?'✓':icon}</div><div class="sbody"><div class="st">${s.t}</div><div class="sm">${s.m}</div>${lab}${rec}${pass}</div></div>`);
   });
 }
 function approve(i){approved[i]=true;renderTrack();}
@@ -349,6 +355,11 @@ const PROGRAMS={
     gapClose:{name:"антикоррупционные",was:0,now:0},
     behavior:{v:"part",c:"«Знания подтверждены, в текущей деятельности применяются ситуативно»."},
     kpi:[{n:"Декларирование конфликта интересов",b:"в норме",a:"в норме",up:false}]},
+  lean:{name:"Применение бережливых технологий в госуправлении",hours:24,cat:"Специалисты",src:"проект «Эффективный регион»",avg:18,
+    comps:[{name:"Оптимизация процессов",src:"проф.-функц.",in:50,out:74},{name:"Картирование потоков",src:"аналитические",in:46,out:68}],
+    gapClose:{name:"проф.-предметные",was:12,now:5},
+    behavior:{v:"yes",c:"«Применил при сокращении сроков согласования документов в отделе»."},
+    kpi:[{n:"Длительность типового процесса",b:"12 дн.",a:"8 дн.",up:true},{n:"Объём исполненных поручений",b:"148/кв",a:"165/кв",up:true}]},
 };
 const sel=document.getElementById('prog');
 Object.keys(PROGRAMS).forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=PROGRAMS[k].name;sel.appendChild(o);});
