@@ -3,63 +3,80 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Единая система профразвития ГГС — прототип</title>
+<title>Учебный портал — модуль профессионального развития</title>
 <style>
   :root{
-    --red:#C80E3F; --red-d:#A50B33; --navy:#1F3864; --navy-l:#2E4F86;
-    --grey:#7F8189; --ink:#242423; --line:#E3E5E9; --bg:#F4F5F7;
-    --card:#FFFFFF; --ok:#1F8A4C; --warn:#C8770E; --bad:#C0392B; --soft:#EDEEF1;
+    --blue:#1E7FF0; --blue2:#2286F6; --acc:#3F63C7; --acc-d:#33509E; --link:#0565DE;
+    --navy:#1B2A4A; --grey:#7A8190; --ink:#23272F; --line:#E5E9F0; --bg:#F2F5FB;
+    --card:#FFFFFF; --ok:#1F8A4C; --warn:#C8770E; --bad:#C0392B; --soft:#EEF3FB; --softb:#DDE7F6;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
-  .wrap{max-width:1060px;margin:0 auto;padding:0 20px 60px}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px 60px}
 
-  .top{background:var(--red);color:#fff;padding:14px 0}
-  .top .wrap{display:flex;align-items:center;gap:14px;padding-bottom:0}
-  .mark{width:34px;height:34px;border:2px solid #fff;border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex:none}
-  .top h1{font-size:15px;font-weight:700}.top .sub{font-size:11.5px;opacity:.85;font-weight:500}
-  .badge{margin-left:auto;font-size:10.5px;text-transform:uppercase;letter-spacing:1px;border:1px solid rgba(255,255,255,.55);padding:4px 10px;border-radius:20px}
+  /* header — синий портал с бликами */
+  .top{background:linear-gradient(120deg,#2286F6,#1E7FF0 60%,#1666CC);color:#fff;padding:0;position:relative;overflow:hidden}
+  .top::after{content:"";position:absolute;right:-60px;top:-90px;width:260px;height:260px;border-radius:50%;border:42px solid rgba(255,255,255,.08)}
+  .top .wrap{display:flex;align-items:center;gap:16px;padding-top:16px;padding-bottom:16px;position:relative;z-index:1}
+  .logo{display:flex;align-items:center;gap:11px;flex:none}
+  .logo .ring{width:40px;height:40px;border-radius:50%;border:2.5px solid #fff;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;letter-spacing:.3px}
+  .logo .lt{font-size:10px;font-weight:700;line-height:1.25;letter-spacing:.3px;opacity:.95}
+  .top h1{font-size:15px;font-weight:700}.top .sub{font-size:11.5px;opacity:.9;font-weight:500}
+  .user{margin-left:auto;text-align:right;font-size:12px}
+  .user b{display:block;font-size:12.5px}.user span{opacity:.85;font-size:11px}
   .demo{background:#FFF6E9;border-bottom:1px solid #F0DDBB;color:#8A5A12;font-size:11.5px;text-align:center;padding:6px 20px}
 
-  .tabs{display:flex;gap:2px;margin-top:22px;border-bottom:2px solid var(--line);flex-wrap:wrap}
-  .tab{appearance:none;border:none;background:none;cursor:pointer;font:inherit;padding:12px 18px;font-weight:600;color:var(--grey);position:relative;border-radius:8px 8px 0 0}
-  .tab[aria-selected="true"]{color:var(--red)}
-  .tab[aria-selected="true"]::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:3px;background:var(--red);border-radius:3px}
-  .tab .role{display:block;font-size:10px;font-weight:600;color:var(--grey);margin-top:1px}
-  .tab[aria-selected="true"] .role{color:var(--red);opacity:.7}
-  .tab:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+  .tabs{display:flex;gap:4px;margin-top:20px;flex-wrap:wrap}
+  .tab{appearance:none;border:none;cursor:pointer;font:inherit;padding:11px 20px;font-weight:600;color:var(--grey);background:#fff;border:1px solid var(--line);border-radius:10px}
+  .tab[aria-selected="true"]{color:#fff;background:var(--blue);border-color:var(--blue)}
+  .tab:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 
   .panel{display:none;animation:fade .25s ease}.panel.on{display:block}
   @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 
-  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px;margin-top:18px}
-  .card h2{font-size:16px;font-weight:700;margin-bottom:4px}
-  .card .hint{color:var(--grey);font-size:12.5px;margin-bottom:16px}
-  .eyebrow{font-size:10.5px;text-transform:uppercase;letter-spacing:1.4px;color:var(--red);font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .ai{font-size:9.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;background:var(--soft);color:var(--navy);padding:3px 9px;border-radius:6px}
-
-  label.fld{display:block;font-size:12px;font-weight:600;color:var(--navy);margin:0 0 6px}
-  select,input[type=number]{width:100%;font:inherit;padding:10px 12px;border:1.5px solid var(--line);border-radius:9px;background:#fff;color:var(--ink)}
-  select:focus,input:focus{outline:none;border-color:var(--navy)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;margin-top:18px;box-shadow:0 1px 3px rgba(20,40,80,.04)}
+  .card h2{font-size:16px;font-weight:700;margin-bottom:4px;color:var(--navy)}
+  .card .hint{color:var(--grey);font-size:12.5px;margin-bottom:14px}
+  .eyebrow{font-size:10.5px;text-transform:uppercase;letter-spacing:1.2px;color:var(--blue);font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .ai{font-size:9.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;background:var(--soft);color:var(--acc);padding:3px 9px;border-radius:6px;border:1px solid var(--softb)}
   .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
-  .chip{font-size:11.5px;background:var(--soft);color:var(--navy);padding:5px 11px;border-radius:20px;font-weight:600}
+  .chip{font-size:11.5px;background:var(--soft);color:var(--acc);padding:5px 11px;border-radius:20px;font-weight:600}
+  select{width:100%;font:inherit;padding:10px 12px;border:1.5px solid var(--line);border-radius:9px;background:#fff;color:var(--ink)}
+  select:focus{outline:none;border-color:var(--blue)}
+  label.fld{display:block;font-size:12px;font-weight:600;color:var(--navy);margin:0 0 6px}
 
-  .btn{appearance:none;border:none;cursor:pointer;font:inherit;font-weight:700;border-radius:10px;padding:12px 22px;background:var(--red);color:#fff;transition:.15s}
-  .btn:hover{background:var(--red-d)}
-  .btn.sec{background:#fff;color:var(--navy);border:1.5px solid var(--line)}.btn.sec:hover{border-color:var(--navy)}
-  .btn.sm{padding:8px 16px;font-size:12.5px}
-  .btn:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
-  .actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  .btn{appearance:none;border:none;cursor:pointer;font:inherit;font-weight:700;border-radius:10px;padding:11px 20px;background:var(--acc);color:#fff;transition:.15s}
+  .btn:hover{background:var(--acc-d)}.btn.sec{background:#fff;color:var(--acc);border:1.5px solid var(--line)}.btn.sec:hover{border-color:var(--acc)}
+  .btn.sm{padding:8px 15px;font-size:12.5px}.btn:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+  .actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
   .note{font-size:11px;color:var(--grey);margin-top:16px;line-height:1.55;border-top:1px solid var(--line);padding-top:12px}
   .secttl{font-size:12.5px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px}
   .src{font-size:10.5px;color:var(--grey);font-weight:600;font-style:italic}
+  .back{appearance:none;border:none;background:none;cursor:pointer;font:inherit;color:var(--link);font-weight:600;font-size:12.5px;padding:0;margin-bottom:4px}
 
-  /* kabinet */
+  /* список служащих */
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+  th{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--grey);font-weight:700}
+  td.c,th.c{text-align:center}
+  tr.clk{cursor:pointer}tr.clk:hover{background:var(--soft)}
+  .who{font-weight:700;color:var(--navy)}
+  .pill{font-size:10.5px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap}
+  .pill.up{background:#FCE9E7;color:var(--bad)}.pill.ok{background:#E6F4EC;color:var(--ok)}.pill.go{background:#E7EEFB;color:var(--acc)}
+  .mini{height:7px;width:84px;background:var(--soft);border-radius:5px;overflow:hidden;display:inline-block;vertical-align:middle}.mini i{display:block;height:100%;border-radius:5px}
+  .tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;padding:4px 9px;border-radius:6px;white-space:nowrap}
+  .tag.eff{background:#E6F4EC;color:var(--ok)}.tag.mid{background:#FCF1E2;color:var(--warn)}.tag.rev{background:#FBE7E5;color:var(--bad)}
+
+  /* карточка служащего */
   .profile{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
-  .ava{width:64px;height:64px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;flex:none}
-  .pinfo .nm{font-size:18px;font-weight:800}.pinfo .ps{font-size:13px;color:var(--grey);margin-top:2px}
+  .ava{width:60px;height:60px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:800;flex:none}
+  .pinfo .nm{font-size:18px;font-weight:800;color:var(--navy)}.pinfo .ps{font-size:13px;color:var(--grey);margin-top:2px}
+  .sources{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+  .source{flex:1;min-width:170px;border:1px solid var(--line);border-radius:10px;padding:11px 13px;background:#FAFCFF}
+  .source .sl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--blue)}
+  .source .sv{font-size:12.5px;font-weight:700;color:var(--navy);margin-top:3px}.source .sd{font-size:11px;color:var(--grey);margin-top:2px}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
-  @media(max-width:820px){.grid2{grid-template-columns:1fr}}
+  @media(max-width:860px){.grid2{grid-template-columns:1fr}}
   .radar-wrap{display:flex;flex-direction:column;align-items:center}
   .radar-leg{display:flex;gap:18px;font-size:11.5px;color:var(--grey);margin-top:6px}
   .radar-leg b{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:middle;margin-right:5px}
@@ -67,334 +84,305 @@
 
   .step{display:flex;gap:13px;padding:13px 0;border-top:1px solid var(--line);align-items:flex-start}.step:first-child{border-top:none}
   .dot{width:26px;height:26px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;margin-top:1px}
-  .dot.done{background:var(--ok)}.dot.prog{background:var(--navy)}.dot.rec{background:#fff;border:2px solid var(--red);color:var(--red)}
-  .sbody{flex:1}.sbody .st{font-weight:700;font-size:13.5px}.sbody .sm{font-size:11.5px;color:var(--grey);margin-top:2px}
+  .dot.done{background:var(--ok)}.dot.prog{background:var(--blue)}.dot.rec{background:#fff;border:2px solid var(--acc);color:var(--acc)}
+  .sbody{flex:1}.sbody .st{font-weight:700;font-size:13.5px;color:var(--navy)}.sbody .sm{font-size:11.5px;color:var(--grey);margin-top:2px}
   .stat{display:inline-block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;padding:3px 9px;border-radius:6px;margin-top:6px}
-  .stat.done{background:#E6F4EC;color:var(--ok)}.stat.prog{background:#E7ECF6;color:var(--navy)}.stat.rec{background:#FCE7ED;color:var(--red)}.stat.appr{background:#E6F4EC;color:var(--ok)}
+  .stat.done{background:#E6F4EC;color:var(--ok)}.stat.prog{background:#E7EEFB;color:var(--acc)}.stat.rec{background:#FCE9E7;color:var(--bad)}.stat.appr{background:#E6F4EC;color:var(--ok)}
   .recact{margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}.recsrc{font-size:11px;color:var(--grey)}
-
+  .aitag{display:inline-block;font-size:9.5px;font-weight:700;color:var(--acc);background:var(--soft);border:1px solid var(--softb);border-radius:5px;padding:2px 7px;margin-top:6px}
   .manual{margin-top:16px;border-top:1px dashed var(--line);padding-top:14px}
   .defs{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
   .def{appearance:none;border:1.5px solid var(--line);background:#fff;cursor:pointer;font:inherit;font-size:12px;font-weight:600;padding:7px 12px;border-radius:20px;color:var(--ink)}
-  .def[aria-pressed="true"]{border-color:var(--red);background:var(--red);color:#fff}
+  .def[aria-pressed="true"]{border-color:var(--acc);background:var(--acc);color:#fff}
 
-  /* passport */
-  .scorehdr{display:grid;grid-template-columns:1fr 92px 92px;gap:12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--grey);font-weight:700}
-  .scorehdr span{text-align:center}.scorehdr span:first-child{text-align:left}
-  .crow{display:grid;grid-template-columns:1fr 92px 92px;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
-  .cname{font-weight:600;font-size:13.5px}.csrc{font-size:11px;color:var(--grey)}
-  .num{font:inherit;width:100%;padding:7px 8px;text-align:center;border:1.5px solid var(--line);border-radius:8px}
-  .result{display:none}.result.on{display:block}
-
+  /* паспорт */
   .lvl{border:1.5px solid var(--line);border-radius:11px;padding:16px;margin-top:12px}
   .lvl .lh{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px;margin-bottom:10px}
   .lvl .lt{font-size:13.5px;font-weight:700;color:var(--navy)}
-  .lvl.ctx{background:#FAFBFD;border-style:dashed}
-
+  .lvl.ctx{background:#FAFCFF;border-style:dashed}
   .drow{padding:10px 0;border-top:1px solid var(--line)}.drow:first-child{border-top:none}
+  .crowlbl{font-size:11px;color:var(--grey);margin-bottom:3px}
   .dtop{display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:7px}
   .dtop .pct{font-weight:800}.dtop .pct.up{color:var(--ok)}.dtop .pct.flat{color:var(--warn)}
   .bar{position:relative;height:9px;background:var(--soft);border-radius:6px;overflow:hidden}
-  .bar .in{position:absolute;top:0;left:0;height:100%;background:#C6C9D2;border-radius:6px}
-  .bar .out{position:absolute;top:0;left:0;height:100%;background:var(--red);border-radius:6px}
-
+  .bar .in{position:absolute;top:0;left:0;height:100%;background:#C3CCDC;border-radius:6px}
+  .bar .out{position:absolute;top:0;left:0;height:100%;background:var(--blue);border-radius:6px}
   .seg{display:flex;gap:8px;margin-top:4px}
-  .segbtn{flex:1;appearance:none;border:1.5px solid var(--line);background:#fff;cursor:pointer;font:inherit;font-weight:600;font-size:12.5px;padding:10px;border-radius:9px;color:var(--ink)}
-  .segbtn[aria-pressed="true"]{border-color:var(--navy);background:var(--navy);color:#fff}
-  textarea{width:100%;font:inherit;margin-top:8px;padding:9px 11px;border:1.5px solid var(--line);border-radius:9px;resize:vertical;min-height:54px}
-  textarea:focus{outline:none;border-color:var(--navy)}
-
+  .segbtn{flex:1;appearance:none;border:1.5px solid var(--line);background:#fff;cursor:default;font:inherit;font-weight:600;font-size:12.5px;padding:10px;border-radius:9px;color:var(--ink)}
+  .segbtn[aria-pressed="true"]{border-color:var(--blue);background:var(--blue);color:#fff}
+  .rkcomment{font-size:12.5px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:9px;padding:10px 12px;margin-top:10px;font-style:italic}
   .kpi{padding:11px 0;border-top:1px solid var(--line)}.kpi:first-of-type{border-top:none}
   .ktop{display:flex;justify-content:space-between;font-size:13px;font-weight:600;align-items:baseline}
   .ktop .kd{font-size:12px;font-weight:700}.ktop .kd.up{color:var(--ok)}.ktop .kd.flat{color:var(--warn)}
   .kvals{font-size:11.5px;color:var(--grey);margin-top:2px}
-
-  .verdict{margin-top:18px;border-radius:12px;padding:18px;background:var(--navy);color:#fff}
-  .verdict h3{font-size:14px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
-  .vline{font-size:13px;margin-top:7px;padding-left:18px;position:relative;opacity:.96}
+  .verdict{margin-top:18px;border-radius:12px;padding:18px;background:linear-gradient(120deg,#2286F6,#1666CC);color:#fff}
+  .verdict h3{font-size:14px;margin-bottom:10px}
+  .vline{font-size:13px;margin-top:7px;padding-left:18px;position:relative;opacity:.97}
   .vline::before{content:"›";position:absolute;left:4px;font-weight:800;opacity:.7}
-  .vrec{margin-top:13px;background:rgba(255,255,255,.13);border-radius:9px;padding:11px 13px;font-size:13px;font-weight:600}
+  .vrec{margin-top:13px;background:rgba(255,255,255,.15);border-radius:9px;padding:11px 13px;font-size:13px;font-weight:600}
 
-  /* analytics */
+  /* аналитика */
   .kbar{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:8px}
   @media(max-width:780px){.kbar{grid-template-columns:1fr}}
   .kpic{border:1.5px solid var(--line);border-radius:11px;padding:15px}
-  .kpic .kn{font-size:11px;color:var(--grey);font-weight:600}
-  .kpic .kv{font-size:28px;font-weight:800;margin-top:3px}.kpic .ku{font-size:11px;color:var(--grey)}
-
-  table{width:100%;border-collapse:collapse;margin-top:8px;font-size:13px}
-  th,td{text-align:left;padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
-  th{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--grey);font-weight:700}
-  td.c,th.c{text-align:center}
-  .mini{height:7px;width:90px;background:var(--soft);border-radius:5px;overflow:hidden;display:inline-block;vertical-align:middle}
-  .mini i{display:block;height:100%;border-radius:5px}
-  .tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;padding:4px 9px;border-radius:6px;white-space:nowrap}
-  .tag.eff{background:#E6F4EC;color:var(--ok)}.tag.mid{background:#FCF1E2;color:var(--warn)}.tag.rev{background:#FBE7E5;color:var(--bad)}
-  .flag{margin-top:16px;border-left:4px solid var(--bad);background:#FBE7E5;border-radius:0 9px 9px 0;padding:13px 15px;font-size:12.5px;color:#7A2018}
-  .flag b{color:var(--bad)}
+  .kpic .kn{font-size:11px;color:var(--grey);font-weight:600}.kpic .kv{font-size:28px;font-weight:800;margin-top:3px;color:var(--navy)}.kpic .ku{font-size:11px;color:var(--grey)}
+  .flag{margin-top:16px;border-left:4px solid var(--bad);background:#FBE7E5;border-radius:0 9px 9px 0;padding:13px 15px;font-size:12.5px;color:#7A2018}.flag b{color:var(--bad)}
+  .aibox{margin-top:16px;border:1.5px solid var(--softb);background:#F6F9FE;border-radius:11px;padding:16px}
+  .aibox h4{font-size:13px;color:var(--navy);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+  .trend{font-size:12.5px;color:var(--ink);padding:7px 0;border-top:1px solid #E2EAF6}.trend:first-of-type{border-top:none}.trend b{color:var(--acc)}
+  .handoff{margin-top:14px;background:var(--soft);border:1px solid var(--softb);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--navy)}
 </style>
 </head>
 <body>
 
-<div class="top">
-  <div class="wrap">
-    <div class="mark">ГГС</div>
-    <div><h1>Единая система профессионального развития ГГС Санкт-Петербурга</h1>
-      <div class="sub">Прототип · единый цикл: профиль → обучение → результат → пересмотр программ</div></div>
-    <div class="badge">демонстрационный макет</div>
-  </div>
-</div>
-<div class="demo">Данные о служащем и программах — условные, сформированы для демонстрации интерфейса и не являются персональными данными реального лица.</div>
+<div class="top"><div class="wrap">
+  <div class="logo"><div class="ring">КОРПУС</div><div class="lt">УЧЕБНЫЙ ПОРТАЛ<br>профессиональное развитие ГГС</div></div>
+  <div><h1 style="margin-left:6px">Модуль профессионального развития</h1><div class="sub" style="margin-left:6px">Рабочее место отдела кадров · Администрация Выборгского района</div></div>
+  <div class="user"><b>Отдел кадров</b><span>Администрация Выборгского района</span></div>
+</div></div>
+<div class="demo">Демонстрационный прототип. Данные о служащих и программах — условные, не являются персональными данными реальных лиц. Оформление в стилистике учебного портала приведено для наглядности.</div>
 
 <div class="wrap">
   <div class="tabs" role="tablist">
-    <button class="tab" role="tab" aria-selected="true" id="t0" onclick="tab(0)">Кабинет служащего<span class="role">взгляд служащего</span></button>
-    <button class="tab" role="tab" aria-selected="false" id="t1" onclick="tab(1)">Паспорт результатов<span class="role">кадровое решение</span></button>
-    <button class="tab" role="tab" aria-selected="false" id="t2" onclick="tab(2)">Аналитика программ<span class="role">Корпоративный университет</span></button>
+    <button class="tab" role="tab" aria-selected="true" id="t0" onclick="tab(0)">Служащие</button>
+    <button class="tab" role="tab" aria-selected="false" id="t1" onclick="tab(1)">Паспорт результатов</button>
+    <button class="tab" role="tab" aria-selected="false" id="t2" onclick="tab(2)">Аналитика программ</button>
   </div>
 
-  <!-- ============ 0: КАБИНЕТ + КОНСТРУКТОР ============ -->
+  <!-- ===== 0a: СПИСОК ===== -->
   <section class="panel on" id="p0" role="tabpanel">
-    <div class="card">
-      <div class="profile">
-        <div class="ava">ИИ</div>
-        <div class="pinfo"><div class="nm">Иванов Иван Иванович</div>
-          <div class="ps">Главный специалист отдела образования · Администрация Выборгского района · 41 год · стаж госслужбы 12 лет</div></div>
-        <div style="margin-left:auto;text-align:right">
-          <div class="chip" style="background:#E7ECF6">Категория: специалисты</div>
-          <div style="font-size:11px;color:var(--grey);margin-top:6px">Профиль обновлён по итогам обучения 2024 г.</div></div>
+    <div id="listView">
+      <div class="card">
+        <h2>Служащие отдела образования</h2>
+        <p class="hint">Сотрудники органа в системе профессионального развития. Выберите служащего, чтобы открыть его профиль и индивидуальную траекторию.</p>
+        <table>
+          <thead><tr><th>Служащий</th><th>Должность</th><th class="c">Категория</th><th class="c">Закрытие профиля</th><th class="c">Статус</th></tr></thead>
+          <tbody id="emptbl"></tbody>
+        </table>
+        <p class="note">«Закрытие профиля» — доля компетенций, доведённых до требуемого по Справочнику Минтруда уровня. Профиль и кадровые данные поступают из ЕИСУ КС; результаты обучения — из учебного портала.</p>
       </div>
     </div>
 
-    <div class="grid2">
-      <div class="card" style="margin-top:0">
-        <div class="secttl">Профиль компетенций: требуется vs факт</div>
-        <div class="radar-wrap">
-          <svg id="radar" viewBox="0 0 320 300" width="100%" style="max-width:360px"></svg>
-          <div class="radar-leg"><span><b style="background:var(--navy)"></b>Требуется (Справочник Минтруда)</span><span><b style="background:var(--red)"></b>Фактический уровень</span></div>
+    <!-- ===== 0b: КАРТОЧКА ===== -->
+    <div id="cardView" style="display:none">
+      <div class="card">
+        <button class="back" onclick="showList()">← К списку служащих</button>
+        <div class="profile">
+          <div class="ava">ИИ</div>
+          <div class="pinfo"><div class="nm">Иванов Иван Иванович</div>
+            <div class="ps">Главный специалист отдела образования · 41 год · стаж госслужбы 12 лет · категория: специалисты</div></div>
+          <div style="margin-left:auto"><button class="btn sm" onclick="tab(1)">Открыть паспорт результатов →</button></div>
         </div>
-        <div class="gapnote" id="gapnote"></div>
-        <p class="note">Дефицит = разрыв между требуемым уровнем по Справочнику Минтруда (для категории должности) и фактическим (входное тестирование + оценка руководителя). Нормативное, а не произвольное основание для подбора обучения.</p>
+        <div class="sources">
+          <div class="source"><div class="sl">Профиль и кадровые данные</div><div class="sv">ЕИСУ КС (федеральный уровень)</div><div class="sd">должность, категория, стаж — по правилам межсистемного взаимодействия</div></div>
+          <div class="source"><div class="sl">Обучение и тестирование</div><div class="sv">Учебный портал · Корпоративный университет</div><div class="sd">программы, результаты входного и итогового тестирования</div></div>
+          <div class="source"><div class="sl">Оценка применения</div><div class="sv">Непосредственный руководитель</div><div class="sd">отложенная оценка и служебные показатели</div></div>
+        </div>
+        <p class="note">Система не дублирует данные, а агрегирует их через межсистемный обмен. Взаимодействие с федеральной ЕИСУ КС — в объёме, установленном федеральными правилами; региональный контур — в полномочиях Санкт-Петербурга. Прецедент обмена в государственных системах описан в работе на примере ГИС «Электронный бюджет».</p>
       </div>
 
-      <div class="card" style="margin-top:0">
-        <div class="secttl">Индивидуальная траектория развития</div>
-        <div id="traj0"></div>
-        <div class="manual">
-          <div style="font-size:12px;font-weight:700;color:var(--navy)">Ручной режим: добрать программу под дефицит <span class="ai">логика по правилам</span></div>
-          <div class="defs" id="defs"></div>
-          <div class="actions" style="margin-top:12px"><button class="btn sm" onclick="addManual()">Добавить в траекторию</button></div>
+      <div class="grid2">
+        <div class="card" style="margin-top:0">
+          <div class="secttl">Профиль компетенций: требуется vs факт</div>
+          <div class="radar-wrap"><svg id="radar" viewBox="0 0 320 300" width="100%" style="max-width:360px"></svg>
+            <div class="radar-leg"><span><b style="background:var(--blue)"></b>Требуется (Справочник Минтруда)</span><span><b style="background:#C3CCDC"></b>—</span></div></div>
+          <div class="gapnote" id="gapnote"></div>
+          <p class="note">Дефицит = разрыв между требуемым уровнем по Справочнику Минтруда и фактическим (входное тестирование + оценка руководителя). Нормативное, а не произвольное основание для подбора обучения.</p>
         </div>
-        <p class="note">Рекомендации формируются по правилам сопоставления профиля со Справочником и не являются кадровым решением: программа попадает в план только после утверждения представителем нанимателя. Основание — ст. 62 ФЗ-79, Закон Санкт-Петербурга № 769-163.</p>
+
+        <div class="card" style="margin-top:0">
+          <div class="secttl">Индивидуальная траектория развития <span class="ai">правила + ИИ-персонализация</span></div>
+          <div id="traj0"></div>
+          <div class="manual">
+            <div style="font-size:12px;font-weight:700;color:var(--navy)">Добрать программу под дефицит вручную</div>
+            <div class="defs" id="defs"></div>
+            <div class="actions"><button class="btn sm" onclick="addManual()">Добавить в траекторию</button></div>
+          </div>
+          <p class="note">Базовый подбор работает по нормативным правилам (дефицит по Справочнику → программа) сразу. ИИ-персонализация подключается по мере накопления данных: учитывает профиль, категорию и результаты сопоставимых служащих. Отдел кадров верифицирует готовую рекомендацию, а не составляет план с нуля; программа включается в план после согласования с руководителем. Основание — ст. 62 ФЗ-79, Закон Санкт-Петербурга № 769-163.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- ============ 1: ПАСПОРТ ============ -->
+  <!-- ===== 1: ПАСПОРТ ===== -->
   <section class="panel" id="p1" role="tabpanel">
     <div class="card">
-      <div class="eyebrow">Направление 1 · замыкание управленческого цикла (уровень: один служащий + одна программа)</div>
-      <h2>Паспорт результатов программы ДПО</h2>
-      <p class="hint">Оценка по модели Киркпатрика. У каждого уровня — свой источник данных: тест измеряет знания, руководитель — применение, отчётность — служебный контекст.</p>
-
-      <label class="fld" for="prog">Программа обучения · служащий: Иванов И. И.</label>
-      <select id="prog" onchange="loadProg()"></select>
+      <h2>Паспорт результатов программы</h2>
+      <p class="hint">Документ формируется системой автоматически из данных тестирования и оценки руководителя. Оценка результата — по модели Киркпатрика: у каждого уровня свой источник данных.</p>
+      <label class="fld" for="prog">Служащий: Иванов И. И. · программа:</label>
+      <select id="prog" onchange="render()"></select>
       <div class="meta" id="meta"></div>
 
-      <div style="margin-top:18px">
-        <div class="scorehdr"><span>Компетенция (привязка к Справочнику)</span><span>Вход, %</span><span>Итог, %</span></div>
-        <div id="comps"></div>
-        <div class="src" style="margin-top:8px">Вход/итог — доля верных ответов входного и итогового тестирования. Фиксируется автоматически системой дистанционного обучения портала; вручную не вводится.</div>
-      </div>
-
-      <div class="actions">
-        <button class="btn" onclick="calcPassport()">Сформировать паспорт</button>
-        <button class="btn sec" onclick="demoFill()">Заполнить демо-данными</button>
-      </div>
-
-      <div class="result" id="res1">
-        <!-- LVL 2 -->
+      <div id="res1">
         <div class="lvl">
-          <div class="lh"><span class="lt">Уровень 2 — научение (прирост знаний)</span><span class="src">источник: тестирование портала</span></div>
+          <div class="lh"><span class="lt">Уровень 2 — научение (прирост знаний)</span><span class="src">источник: тестирование портала · автоматически</span></div>
           <div id="delta"></div>
         </div>
-        <!-- LVL 3 -->
         <div class="lvl">
           <div class="lh"><span class="lt">Уровень 3 — поведение (применение на работе)</span><span class="src">источник: оценка руководителя, через 3–6 мес.</span></div>
-          <p style="font-size:12.5px;color:var(--grey);margin-bottom:6px">Применяет ли служащий полученные компетенции в служебной деятельности?</p>
-          <div class="seg">
-            <button class="segbtn" aria-pressed="false" onclick="follow(this,'yes')">Да, применяет</button>
-            <button class="segbtn" aria-pressed="false" onclick="follow(this,'part')">Частично</button>
-            <button class="segbtn" aria-pressed="false" onclick="follow(this,'no')">Пока нет</button>
-          </div>
-          <textarea placeholder="Комментарий руководителя (необязательно): в каких задачах применяется…"></textarea>
-          <div class="src" style="margin-top:6px">Качественная оценка, а не балл: применение на рабочем месте не выводится из теста и подтверждается человеком.</div>
+          <div id="behavior"></div>
+          <div class="src" style="margin-top:8px">Качественная оценка, а не балл: применение на рабочем месте не выводится из теста и подтверждается человеком.</div>
         </div>
-        <!-- LVL 4 -->
         <div class="lvl ctx">
-          <div class="lh"><span class="lt">Уровень 4 — служебные показатели (контекст)</span><span class="src">источник: кадровая отчётность</span></div>
+          <div class="lh"><span class="lt">Уровень 4 — служебные показатели (контекст)</span><span class="src">источник: вносятся руководителем при оценке</span></div>
           <div id="kpis"></div>
-          <div class="src" style="margin-top:8px">KPI отражают контекст служебной результативности и не являются прямым доказательством эффекта обучения: на них влияет много факторов. Учитываются как фон, не как мерило программы.</div>
+          <div class="src" style="margin-top:8px">Показатели вносит руководитель при отложенной оценке (он располагает ими по своему подразделению) — без автоматической интеграции с документооборотом. Отражают контекст служебной результативности, а не прямой эффект обучения.</div>
         </div>
-
-        <!-- VERDICT -->
         <div class="verdict" id="verdict"></div>
-        <p class="note">Паспорт входит в аналитический модуль портала: на уровне служащего — материал для индивидуального плана и подготовки к аттестации; в агрегате — основа для пересмотра программ (вкладка «Аналитика программ»). Процедура аттестации (Указ № 110) не изменяется. Обработка данных — с соблюдением ФЗ-152.</p>
+        <p class="note">Паспорт используется отделом кадров как материал для индивидуального плана развития и подготовки к аттестации; в обезличенном агрегате передаётся в Корпоративный университет для оценки программ (вкладка «Аналитика программ»). Процедура аттестации (Указ № 110) не изменяется. Обработка данных — с соблюдением ФЗ-152.</p>
       </div>
     </div>
   </section>
 
-  <!-- ============ 2: АНАЛИТИКА ПРОГРАММ ============ -->
+  <!-- ===== 2: АНАЛИТИКА ===== -->
   <section class="panel" id="p2" role="tabpanel">
     <div class="card">
-      <div class="eyebrow">Замыкание цикла · уровень: все служащие + все программы</div>
-      <h2>Аналитика программ для Корпоративного университета</h2>
-      <p class="hint">Сводка паспортов результатов по всем участникам. Показывает, какие программы реально повышают профессионализм, а какие носят формальный характер и подлежат пересмотру.</p>
-
+      <div class="eyebrow">Сводный уровень · Корпоративный университет</div>
+      <h2>Аналитика программ</h2>
+      <p class="hint">Сводка обезличенных паспортов по всем участникам: какие программы реально повышают профессионализм, а какие требуют пересмотра формата. Формируется Корпоративным университетом по данным из районов.</p>
       <div class="kbar">
         <div class="kpic"><div class="kn">Участников за период</div><div class="kv">5 148</div><div class="ku">прошли ДПО, 2025 г.</div></div>
         <div class="kpic"><div class="kn">Средний прирост знаний</div><div class="kv">+22</div><div class="ku">п.п. по тестам (ур. 2)</div></div>
         <div class="kpic"><div class="kn">Подтверждённое применение</div><div class="kv">58%</div><div class="ku">оценка руководителей (ур. 3)</div></div>
       </div>
-
       <div class="secttl" style="margin-top:18px">Эффективность программ</div>
-      <table>
-        <thead><tr>
-          <th>Программа</th><th class="c">Прошли</th><th class="c">Прирост знаний</th><th class="c">Применение</th><th class="c">Статус</th>
-        </tr></thead>
-        <tbody id="progtbl"></tbody>
-      </table>
-
+      <table><thead><tr><th>Программа</th><th class="c">Прошли</th><th class="c">Прирост знаний</th><th class="c">Применение</th><th class="c">Статус</th></tr></thead><tbody id="progtbl"></tbody></table>
       <div class="flag" id="flag"></div>
-      <p class="note">Статус назначается по правилам: «эффективна» — прирост ≥ +20 п.п. и применение ≥ 60%; «усилить практику» — средние значения; «пересмотреть» — низкий прирост и низкое применение. Решение о судьбе программы принимает Корпоративный университет; система лишь выявляет кандидатов. Это и есть замыкание управленческого цикла: результат обучения влияет на содержание следующих программ.</p>
+      <div class="aibox">
+        <h4>Выявленные тенденции <span class="ai">элементы ИИ</span></h4>
+        <div class="trend">По накопленным данным растёт разрыв между требуемым и фактическим уровнем компетенции <b>«анализ данных»</b> у категории специалистов — тенденция к усилению дефицита. Рекомендуется заранее расширить соответствующий блок программ.</div>
+        <div class="trend">Служащие, прошедшие <b>«Практикум по ГИС» до</b> программы по цифровой трансформации, показывают прирост в среднем на <b>9 п.п. выше</b>. Выявлена устойчивая связь порядка прохождения — предложен скорректированный порядок в траектории.</div>
+        <div class="trend">Программы продолжительностью <b>менее 16 ч</b> в среднем дают подтверждённое применение ниже 35% — тенденция связи длительности и закрепления навыка.</div>
+        <p class="src" style="margin-top:10px">Тенденции выявляются на обезличенном агрегате и носят рекомендательный характер. Это не прогноз-предсказание и не кадровое решение: выводы по содержанию программ принимает Корпоративный университет.</p>
+      </div>
+      <div class="handoff">Связь уровней: отдел кадров района формирует паспорта результатов своих служащих → обезличенные данные поступают на сводный уровень → Корпоративный университет на их основе пересматривает программы. Так результат обучения влияет на содержание следующих программ.</div>
+      <p class="note">Статус по правилам: «эффективна» — прирост ≥ +20 п.п. и применение ≥ 60%; «усилить практику» — средние значения; «пересмотреть формат» — низкий прирост при низком применении. Для обязательных программ пересмотр касается формата подачи, а не факта проведения или содержания темы (тема сохраняется по закону).</p>
     </div>
   </section>
 </div>
 
 <script>
-function tab(n){[0,1,2].forEach(i=>{document.getElementById('p'+i).classList.toggle('on',i===n);document.getElementById('t'+i).setAttribute('aria-selected',i===n);});}
+function tab(n){[0,1,2].forEach(i=>{document.getElementById('p'+i).classList.toggle('on',i===n);document.getElementById('t'+i).setAttribute('aria-selected',i===n);});if(n===0)showCard();}
 
-/* ===== РАДАР ===== */
+/* ---- список ---- */
+const EMP=[
+  {fio:"Иванов Иван Иванович",pos:"Главный специалист",cat:"специалисты",close:62,st:["up","Есть дефицит"],open:true},
+  {fio:"Петрова Анна Сергеевна",pos:"Ведущий специалист",cat:"специалисты",close:81,st:["ok","Профиль закрыт"]},
+  {fio:"Соколов Дмитрий Петрович",pos:"Начальник отдела",cat:"руководители",close:74,st:["go","Обучение идёт"]},
+  {fio:"Кузнецова Ольга Викторовна",pos:"Специалист 1 разряда",cat:"обеспечивающие",close:58,st:["up","Есть дефицит"]},
+  {fio:"Морозов Артём Игоревич",pos:"Главный специалист",cat:"специалисты",close:69,st:["go","Обучение идёт"]},
+];
+function renderList(){
+  const tb=document.getElementById('emptbl');tb.innerHTML="";
+  EMP.forEach(e=>{
+    const clk=e.open?'class="clk" onclick="openCard()"':'';
+    tb.insertAdjacentHTML('beforeend',`<tr ${clk}>
+      <td class="who">${e.fio}${e.open?' <span style="font-size:11px;color:var(--link);font-weight:600">(открыть)</span>':''}</td>
+      <td>${e.pos}</td><td class="c">${e.cat}</td>
+      <td class="c"><span class="mini"><i style="width:${e.close}%;background:${e.close>=75?'#1F8A4C':e.close>=65?'#C8770E':'#C0392B'}"></i></span> ${e.close}%</td>
+      <td class="c"><span class="pill ${e.st[0]}">${e.st[1]}</span></td></tr>`);
+  });
+}
+function openCard(){document.getElementById('listView').style.display='none';document.getElementById('cardView').style.display='block';drawRadar();renderTrack();}
+function showList(){document.getElementById('cardView').style.display='none';document.getElementById('listView').style.display='block';}
+function showCard(){/* остаёмся где были */}
+
+/* ---- радар ---- */
 const COMPS=[{k:"Цифровая\nграмотность",req:80,fact:55},{k:"Работа\nс ГИС",req:75,fact:48},{k:"Анализ\nданных",req:70,fact:50},{k:"Проф.-\nпредметные",req:85,fact:78},{k:"Антикор-\nрупционные",req:80,fact:82},{k:"Коммуни-\nкация",req:70,fact:66}];
 function drawRadar(){
   const cx=160,cy=145,R=100,N=COMPS.length,ng=4;let svg="";
-  for(let g=1;g<=ng;g++){let pts=[];for(let i=0;i<N;i++){const a=-Math.PI/2+i*2*Math.PI/N,r=R*g/ng;pts.push((cx+r*Math.cos(a)).toFixed(1)+","+(cy+r*Math.sin(a)).toFixed(1));}svg+=`<polygon points="${pts.join(' ')}" fill="none" stroke="#E3E5E9" stroke-width="1"/>`;}
+  for(let g=1;g<=ng;g++){let pts=[];for(let i=0;i<N;i++){const a=-Math.PI/2+i*2*Math.PI/N,r=R*g/ng;pts.push((cx+r*Math.cos(a)).toFixed(1)+","+(cy+r*Math.sin(a)).toFixed(1));}svg+=`<polygon points="${pts.join(' ')}" fill="none" stroke="#E5E9F0" stroke-width="1"/>`;}
   for(let i=0;i<N;i++){const a=-Math.PI/2+i*2*Math.PI/N,x=cx+R*Math.cos(a),y=cy+R*Math.sin(a);
-    svg+=`<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#E3E5E9" stroke-width="1"/>`;
+    svg+=`<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#E5E9F0" stroke-width="1"/>`;
     const lx=cx+(R+22)*Math.cos(a),ly=cy+(R+22)*Math.sin(a),lines=COMPS[i].k.split("\n");
     let anc=Math.abs(Math.cos(a))<0.3?"middle":(Math.cos(a)>0?"start":"end");
-    lines.forEach((ln,j)=>svg+=`<text x="${lx.toFixed(1)}" y="${(ly+j*10-(lines.length-1)*5).toFixed(1)}" font-size="9" fill="#7F8189" text-anchor="${anc}" font-family="Arial">${ln}</text>`);}
+    lines.forEach((ln,j)=>svg+=`<text x="${lx.toFixed(1)}" y="${(ly+j*10-(lines.length-1)*5).toFixed(1)}" font-size="9" fill="#7A8190" text-anchor="${anc}" font-family="Arial">${ln}</text>`);}
   const poly=(key,c,f)=>{let pts=[];for(let i=0;i<N;i++){const a=-Math.PI/2+i*2*Math.PI/N,r=R*COMPS[i][key]/100;pts.push((cx+r*Math.cos(a)).toFixed(1)+","+(cy+r*Math.sin(a)).toFixed(1));}return `<polygon points="${pts.join(' ')}" fill="${f}" stroke="${c}" stroke-width="2"/>`;};
-  svg+=poly("req","#1F3864","rgba(31,56,100,.10)");svg+=poly("fact","#C80E3F","rgba(200,14,63,.18)");
+  svg+=poly("req","#1E7FF0","rgba(30,127,240,.10)");svg+=poly("fact","#C0392B","rgba(192,57,43,.16)");
   document.getElementById('radar').innerHTML=svg;
   let gaps=COMPS.map(c=>({k:c.k.replace(/\n/g,' ').trim(),g:c.req-c.fact})).filter(x=>x.g>=15).sort((a,b)=>b.g-a.g);
   document.getElementById('gapnote').innerHTML="Наибольший дефицит: "+gaps.map(x=>x.k+" (−"+x.g+")").join(", ")+". Эти компетенции — основание для подбора траектории.";
+  // легенда factual color fix
+  document.querySelector('.radar-leg').innerHTML='<span><b style="background:#1E7FF0"></b>Требуется (Справочник Минтруда)</span><span><b style="background:#C0392B"></b>Фактический уровень</span>';
 }
 
-/* ===== ТРАЕКТОРИЯ ===== */
+/* ---- траектория ---- */
 const TRACK=[
   {t:"Противодействие коррупции на госслужбе",m:"16 ч · 2024 · обязательная",status:"done"},
   {t:"Применение бережливых технологий в госуправлении",m:"24 ч · 2024 · «Эффективный регион»",status:"done"},
   {t:"Современное госуправление в условиях цифровой трансформации",m:"44 ч · с 09.2025 · в процессе",status:"prog"},
-  {t:"Практикум по работе в ведомственных ГИС",m:"24 ч · рекомендовано",status:"rec",src:"дефицит «Работа с ГИС» −27"},
-  {t:"Анализ данных для управленческих задач",m:"24 ч · рекомендовано",status:"rec",src:"дефицит «Анализ данных» −20"},
+  {t:"Практикум по работе в ведомственных ГИС",m:"24 ч · рекомендовано",status:"rec",src:"дефицит «Работа с ГИС» −27",ai:true},
+  {t:"Анализ данных для управленческих задач",m:"24 ч · рекомендовано",status:"rec",src:"дефицит «Анализ данных» −20",ai:true},
 ];
 const approved={};
 function renderTrack(){
   const box=document.getElementById('traj0');box.innerHTML="";
   TRACK.forEach((s,i)=>{
     let icon=s.status==="done"?"✓":(s.status==="prog"?"●":"→"),cls=s.status;
-    let lab=s.status==="done"?'<span class="stat done">Пройдено</span>':s.status==="prog"?'<span class="stat prog">В процессе</span>':(approved[i]?'<span class="stat appr">✓ Утверждено руководителем · в плане</span>':'<span class="stat rec">Рекомендовано · ожидает утверждения</span>');
-    let rec=s.status==="rec"?`<div class="recact"><span class="recsrc">основание: ${s.src} · подбор по правилам</span>${approved[i]?'':`<button class="btn sm" onclick="approve(${i})">Утвердить (руководитель)</button>`}</div>`:"";
+    let lab=s.status==="done"?'<span class="stat done">Пройдено</span>':s.status==="prog"?'<span class="stat prog">В процессе</span>':(approved[i]?'<span class="stat appr">✓ Согласовано руководителем · в плане</span>':'<span class="stat rec">Рекомендовано · ожидает согласования руководителя</span>');
+    let aitag=s.ai?'<span class="aitag">приоритет уточнён ИИ-персонализацией</span>':'';
+    let rec=s.status==="rec"?`<div class="recact"><span class="recsrc">основание: ${s.src}</span>${approved[i]?'':`<button class="btn sm" onclick="approve(${i})">Направить на согласование</button>`}</div>${aitag}`:"";
     box.insertAdjacentHTML('beforeend',`<div class="step"><div class="dot ${cls}">${approved[i]?'✓':icon}</div><div class="sbody"><div class="st">${s.t}</div><div class="sm">${s.m}</div>${lab}${rec}</div></div>`);
   });
 }
 function approve(i){approved[i]=true;renderTrack();}
-
-/* ручной добор */
 const DEFMAP={"Работа с ГИС":{t:"Практикум по работе в ведомственных ГИС",m:"24 ч"},"Анализ данных":{t:"Анализ данных для управленческих задач",m:"24 ч"},"Цифровая грамотность":{t:"Цифровая грамотность государственного служащего",m:"16 ч"},"Информационная безопасность":{t:"Информационная безопасность и кибергигиена",m:"16 ч · ФЗ-152"},"Коммуникация":{t:"Работа с обращениями и публичная коммуникация",m:"16 ч"}};
-let pick=null;
-const defBox=document.getElementById('defs');
+let pick=null;const defBox=document.getElementById('defs');
 Object.keys(DEFMAP).forEach(d=>defBox.insertAdjacentHTML('beforeend',`<button class="def" aria-pressed="false" onclick="pickDef(this,'${d}')">${d}</button>`));
 function pickDef(b,d){pick=d;document.querySelectorAll('.def').forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');}
-function addManual(){
-  if(!pick){alert('Выберите дефицит');return;}
-  const m=DEFMAP[pick];
-  if(TRACK.some(x=>x.t===m.t)){alert('Эта программа уже в траектории');return;}
-  TRACK.push({t:m.t,m:m.m+" · добавлено вручную",status:"rec",src:"ручной подбор под дефицит «"+pick+"»"});
-  pick=null;document.querySelectorAll('.def').forEach(x=>x.setAttribute('aria-pressed','false'));
-  renderTrack();
-}
+function addManual(){if(!pick){alert('Выберите дефицит');return;}const m=DEFMAP[pick];if(TRACK.some(x=>x.t===m.t)){alert('Уже в траектории');return;}TRACK.push({t:m.t,m:m.m+" · добавлено вручную",status:"rec",src:"ручной подбор под дефицит «"+pick+"»",ai:false});pick=null;document.querySelectorAll('.def').forEach(x=>x.setAttribute('aria-pressed','false'));renderTrack();}
 
-/* ===== ПАСПОРТ ===== */
+/* ---- паспорт ---- */
 const PROGRAMS={
   digital:{name:"Современное госуправление в условиях цифровой трансформации",hours:44,cat:"Специалисты / руководители",src:"Корпоративный университет СПб",avg:31,
-    comps:[{name:"Управление на основе данных",src:"Справочник · ИКТ"},{name:"Работа с дашбордами",src:"проф.-функц."},{name:"Оценка цифровых решений",src:"управленческие"}],
+    comps:[{name:"Управление на основе данных",src:"Справочник · ИКТ",in:42,out:78},{name:"Работа с дашбордами",src:"проф.-функц.",in:35,out:80},{name:"Оценка цифровых решений",src:"управленческие",in:48,out:72}],
     gapClose:{name:"управление на основе данных",was:25,now:3},
+    behavior:{v:"yes",c:"«Применяет при подготовке аналитических справок по сети образовательных учреждений района»."},
     kpi:[{n:"Соблюдение сроков исполнения поручений",b:"84%",a:"93%",up:true},{n:"Оперативность ответов на обращения",b:"6,2 дн.",a:"4,5 дн.",up:true},{n:"Доля поручений с замечаниями",b:"11%",a:"6%",up:true}]},
   gis:{name:"Практикум по работе в ведомственных ГИС",hours:24,cat:"Специалисты",src:"прикладной модуль",avg:28,
-    comps:[{name:"Работа в ведомственных ГИС",src:"Справочник · ИКТ"},{name:"Электронный документооборот",src:"проф.-функц."}],
+    comps:[{name:"Работа в ведомственных ГИС",src:"Справочник · ИКТ",in:40,out:82},{name:"Электронный документооборот",src:"проф.-функц.",in:45,out:79}],
     gapClose:{name:"работа с ГИС",was:27,now:6},
+    behavior:{v:"yes",c:"«Самостоятельно ведёт регистрацию и обработку обращений в ведомственной ГИС»."},
     kpi:[{n:"Объём обработанных документов в ГИС",b:"320/мес",a:"410/мес",up:true},{n:"Время регистрации обращения",b:"14 мин",a:"9 мин",up:true},{n:"Ошибки ввода данных",b:"4,1%",a:"1,8%",up:true}]},
-  anticor:{name:"Противодействие коррупции на госслужбе",hours:16,cat:"Все категории · обязательная",src:"обязательная программа",avg:5,
-    comps:[{name:"Идентификация коррупционных рисков",src:"Справочник · антикор."},{name:"Конфликт интересов",src:"ФЗ-273 о ПК"}],
+  anticor:{name:"Противодействие коррупции на госслужбе (семинар)",hours:16,cat:"Все категории · обязательная",src:"обязательная программа",avg:5,
+    comps:[{name:"Идентификация коррупционных рисков",src:"Справочник · антикор.",in:63,out:68},{name:"Конфликт интересов",src:"ФЗ-273 о ПК",in:60,out:64}],
     gapClose:{name:"антикоррупционные",was:0,now:0},
-    kpi:[{n:"Декларирование конфликта интересов",b:"да",a:"да",up:false}]},
+    behavior:{v:"part",c:"«Знания подтверждены, в текущей деятельности применяются ситуативно»."},
+    kpi:[{n:"Декларирование конфликта интересов",b:"в норме",a:"в норме",up:false}]},
 };
 const sel=document.getElementById('prog');
 Object.keys(PROGRAMS).forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=PROGRAMS[k].name;sel.appendChild(o);});
-let followVal=null;
-function loadProg(){
+function render(){
   const p=PROGRAMS[sel.value];
   document.getElementById('meta').innerHTML=`<span class="chip">${p.hours} ак. ч.</span><span class="chip">${p.cat}</span><span class="chip">${p.src}</span>`;
-  const box=document.getElementById('comps');box.innerHTML='';
-  p.comps.forEach((c,i)=>box.insertAdjacentHTML('beforeend',`<div class="crow"><div><div class="cname">${c.name}</div><div class="csrc">${c.src}</div></div><input class="num" type="number" min="0" max="100" id="in${i}" placeholder="0"><input class="num" type="number" min="0" max="100" id="out${i}" placeholder="0"></div>`));
-  document.getElementById('res1').classList.remove('on');followVal=null;
-}
-function demoFill(){
-  const pr={digital:[[42,78],[35,80],[48,72]],gis:[[40,82],[45,79]],anticor:[[63,68],[60,64]]};
-  (pr[sel.value]||[]).forEach((v,i)=>{const a=document.getElementById('in'+i),b=document.getElementById('out'+i);if(a)a.value=v[0];if(b)b.value=v[1];});
-  calcPassport();
-}
-function follow(b,v){followVal=v;document.querySelectorAll('#res1 .segbtn').forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');renderVerdict();}
-let lastGain=0;
-function calcPassport(){
-  const p=PROGRAMS[sel.value];let sIn=0,sOut=0,n=0,rows='';
-  p.comps.forEach((c,i)=>{const a=+(document.getElementById('in'+i).value||0),b=+(document.getElementById('out'+i).value||0);sIn+=a;sOut+=b;n++;const d=b-a,up=d>=8;
-    rows+=`<div class="drow"><div class="dtop"><span>${c.name}</span><span class="pct ${up?'up':'flat'}">${d>=0?'+':''}${d} п.п.</span></div><div class="bar"><div class="in" style="width:${a}%"></div><div class="out" style="width:${b}%"></div></div></div>`;});
-  const avgIn=Math.round(sIn/n),avgOut=Math.round(sOut/n),gain=avgOut-avgIn;lastGain=gain;
-  document.getElementById('delta').innerHTML=rows+`<div class="radar-leg" style="margin-top:10px"><span><b style="background:#C6C9D2"></b>вход (ср. ${avgIn}%)</span><span><b style="background:var(--red)"></b>итог (ср. ${avgOut}%)</span></div>`;
+  let sIn=0,sOut=0,n=0,rows='';
+  p.comps.forEach(c=>{sIn+=c.in;sOut+=c.out;n++;const d=c.out-c.in,up=d>=8;
+    rows+=`<div class="drow"><div class="crowlbl">${c.name} · ${c.src}</div><div class="dtop"><span style="font-size:11.5px;color:var(--grey)">вход ${c.in}% → итог ${c.out}%</span><span class="pct ${up?'up':'flat'}">${d>=0?'+':''}${d} п.п.</span></div><div class="bar"><div class="in" style="width:${c.in}%"></div><div class="out" style="width:${c.out}%"></div></div></div>`;});
+  const avgIn=Math.round(sIn/n),avgOut=Math.round(sOut/n),gain=avgOut-avgIn;
+  document.getElementById('delta').innerHTML=rows+`<div class="radar-leg" style="margin-top:10px"><span><b style="background:#C3CCDC"></b>вход (ср. ${avgIn}%)</span><span><b style="background:#1E7FF0"></b>итог (ср. ${avgOut}%)</span></div>`;
+  const bv={yes:'Да, применяет',part:'Частично',no:'Пока нет'};
+  let bhtml=`<div class="seg">`+['yes','part','no'].map(k=>`<button class="segbtn" aria-pressed="${p.behavior.v===k}">${bv[k]}</button>`).join('')+`</div><div class="rkcomment">Комментарий руководителя: ${p.behavior.c}</div>`;
+  document.getElementById('behavior').innerHTML=bhtml;
   let k='';p.kpi.forEach(x=>k+=`<div class="kpi"><div class="ktop"><span>${x.n}</span><span class="kd ${x.up?'up':'flat'}">${x.up?'улучшение':'без изменений'}</span></div><div class="kvals">до обучения: <b>${x.b}</b> → после (через 3–6 мес.): <b>${x.a}</b></div></div>`);
   document.getElementById('kpis').innerHTML=k;
-  document.querySelectorAll('#res1 .segbtn').forEach(x=>x.setAttribute('aria-pressed','false'));followVal=null;
-  document.getElementById('res1').classList.add('on');
-  renderVerdict();
-}
-function renderVerdict(){
-  const p=PROGRAMS[sel.value],gain=lastGain;
   let lines=[];
-  // прирост vs среднее
-  if(gain>=p.avg+3) lines.push(`Прирост знаний <b>+${gain} п.п.</b> — <b>выше среднего</b> по программе (${p.avg}).`);
-  else if(gain<=p.avg-3) lines.push(`Прирост знаний <b>+${gain} п.п.</b> — <b>ниже среднего</b> по программе (${p.avg}).`);
+  if(gain>=p.avg+3)lines.push(`Прирост знаний <b>+${gain} п.п.</b> — <b>выше среднего</b> по программе (${p.avg}).`);
+  else if(gain<=p.avg-3)lines.push(`Прирост знаний <b>+${gain} п.п.</b> — <b>ниже среднего</b> по программе (${p.avg}).`);
   else lines.push(`Прирост знаний <b>+${gain} п.п.</b> — на уровне среднего по программе (${p.avg}).`);
-  // закрытие дефицита
   const g=p.gapClose;
-  if(g.was>=10){ if(g.now<=8) lines.push(`Дефицит «${g.name}» сокращён с −${g.was} до −${g.now} — <b>почти закрыт</b>.`); else lines.push(`Дефицит «${g.name}»: −${g.was} → −${g.now}, остаётся существенным.`);}
-  else lines.push(`Программа обязательная, не связана с закрытием дефицита компетенций.`);
-  // применение
-  if(followVal==='yes') lines.push(`Руководитель подтвердил применение на рабочем месте.`);
-  else if(followVal==='part') lines.push(`Руководитель отметил частичное применение.`);
-  else if(followVal==='no') lines.push(`Применение на рабочем месте пока не подтверждено.`);
-  else lines.push(`Оценка применения руководителем — ожидается (через 3–6 мес.).`);
-  // рекомендация
+  if(g.was>=10){g.now<=8?lines.push(`Дефицит «${g.name}» сокращён с −${g.was} до −${g.now} — <b>почти закрыт</b>.`):lines.push(`Дефицит «${g.name}»: −${g.was} → −${g.now}, остаётся существенным.`);}
+  else lines.push(`Программа обязательная, с закрытием дефицита не связана.`);
+  if(p.behavior.v==='yes')lines.push(`Руководитель подтвердил применение на рабочем месте.`);
+  else if(p.behavior.v==='part')lines.push(`Руководитель отметил частичное применение.`);
+  else lines.push(`Применение пока не подтверждено.`);
   let rec;
-  if(gain>=p.avg && g.was>=10 && g.now<=8 && followVal==='yes') rec="Рекомендация: компетенция доведена до требуемого уровня и применяется — рассмотреть для кадрового резерва.";
-  else if(gain<10) rec="Рекомендация: прирост низкий — для служащего рассмотреть иной формат; для оператора — проверить программу в «Аналитике программ».";
+  if(gain>=p.avg&&g.was>=10&&g.now<=8&&p.behavior.v==='yes')rec="Рекомендация отдела кадров: компетенция доведена до требуемого уровня и применяется — рассмотреть для кадрового резерва.";
+  else if(gain<10)rec="Рекомендация: прирост низкий. Для служащего — иной формат; данные переданы в «Аналитику программ» для оценки эффективности программы.";
   else rec="Рекомендация: продолжить траекторию; при подтверждённом применении — учитывать при подготовке к аттестации.";
   document.getElementById('verdict').innerHTML=`<h3>Вывод по паспорту</h3>${lines.map(l=>`<div class="vline">${l}</div>`).join('')}<div class="vrec">${rec}</div>`;
 }
 
-/* ===== АНАЛИТИКА ПРОГРАММ ===== */
+/* ---- аналитика ---- */
 const PROGSTAT=[
   {name:"Современное госуправление (цифровая трансформация)",n:612,gain:31,apply:71},
   {name:"Практикум по работе в ведомственных ГИС",n:430,gain:28,apply:65},
@@ -403,25 +391,16 @@ const PROGSTAT=[
   {name:"Противодействие коррупции на госслужбе (семинар)",n:1503,gain:5,apply:25},
   {name:"Основы делопроизводства (обязательный модуль)",n:498,gain:7,apply:31},
 ];
-function statusOf(g,a){if(g>=20&&a>=60)return["eff","Эффективна"];if(g>=12&&a>=45)return["mid","Усилить практику"];return["rev","Пересмотреть"];}
+function statusOf(g,a){if(g>=20&&a>=60)return["eff","Эффективна"];if(g>=12&&a>=45)return["mid","Усилить практику"];return["rev","Пересмотреть формат"];}
 function barColor(s){return s==="eff"?"#1F8A4C":s==="mid"?"#C8770E":"#C0392B";}
 function renderAnalytics(){
-  const tb=document.getElementById('progtbl');tb.innerHTML="";
-  let rev=[];
-  PROGSTAT.forEach(p=>{
-    const [s,label]=statusOf(p.gain,p.apply);if(s==="rev")rev.push(p.name);
-    tb.insertAdjacentHTML('beforeend',`<tr>
-      <td>${p.name}</td>
-      <td class="c">${p.n}</td>
-      <td class="c"><span class="mini"><i style="width:${Math.min(100,p.gain*3)}%;background:${barColor(s)}"></i></span> <b>+${p.gain}</b></td>
-      <td class="c"><span class="mini"><i style="width:${p.apply}%;background:${barColor(s)}"></i></span> ${p.apply}%</td>
-      <td class="c"><span class="tag ${s}">${label}</span></td></tr>`);
-  });
-  document.getElementById('flag').innerHTML=`<b>Кандидаты на пересмотр:</b> ${rev.join("; ")}. Эти программы дают низкий прирост знаний при низком подтверждённом применении — они носят преимущественно формальный, «отчётный» характер. Именно так система автоматически выявляет формализм, который иначе остаётся незамеченным в общих показателях охвата.`;
+  const tb=document.getElementById('progtbl');tb.innerHTML="";let rev=[];
+  PROGSTAT.forEach(p=>{const [s,label]=statusOf(p.gain,p.apply);if(s==="rev")rev.push(p.name);
+    tb.insertAdjacentHTML('beforeend',`<tr><td>${p.name}</td><td class="c">${p.n}</td><td class="c"><span class="mini"><i style="width:${Math.min(100,p.gain*3)}%;background:${barColor(s)}"></i></span> <b>+${p.gain}</b></td><td class="c"><span class="mini"><i style="width:${p.apply}%;background:${barColor(s)}"></i></span> ${p.apply}%</td><td class="c"><span class="tag ${s}">${label}</span></td></tr>`);});
+  document.getElementById('flag').innerHTML=`<b>Кандидаты на пересмотр формата:</b> ${rev.join("; ")}. Низкий прирост знаний при низком подтверждённом применении указывает на формальный, «отчётный» характер. Для обязательных программ это сигнал переработать формат подачи (тема сохраняется по закону), а не отменять. Так система автоматически выявляет формализм, который иначе теряется в общих показателях охвата.`;
 }
 
-/* init */
-drawRadar();renderTrack();loadProg();renderAnalytics();
+renderList();render();renderAnalytics();
 </script>
 </body>
 </html>
