@@ -82,7 +82,10 @@
   .stat{display:inline-block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;padding:3px 9px;border-radius:2px;margin-top:6px;border:1px solid}
   .stat.done{background:#F0F6F2;color:#155C32;border-color:#C2D9CB}.stat.prog{background:#EEF2F7;color:#0B4A8F;border-color:#C4D1E0}.stat.rec{background:#FBF2F1;color:#8E231E;border-color:#E3C3C0}.stat.appr{background:#F0F6F2;color:#155C32;border-color:#C2D9CB}
   .recact{margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}.recsrc{font-size:11px;color:var(--grey)}
-  .aitag{display:inline-block;font-size:9.5px;font-weight:700;color:var(--acc);background:var(--soft);border:1px solid var(--softb);border-radius:5px;padding:2px 7px;margin-top:6px}
+  .act-row{margin-top:8px}
+  .btn.act{display:inline-block;padding:8px 16px;font-size:12px;font-weight:600;background:#E4ECF5;color:var(--acc);border:1px solid var(--softb);border-radius:2px}
+  .btn.act:hover{background:#D5E1F0}
+  .aitag{display:inline-block;font-size:9.5px;font-weight:700;color:#33455A;background:#EEF2F7;border:1px solid #CBD5E2;border-radius:2px;padding:2px 7px;margin-top:6px}
   .manual{margin-top:16px;border-top:1px dashed var(--line);padding-top:14px}
   .defs{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
   .def{appearance:none;border:1.5px solid var(--line);background:#fff;cursor:pointer;font:inherit;font-size:12px;font-weight:600;padding:7px 12px;border-radius:3px;color:var(--ink)}
@@ -142,7 +145,6 @@
   <section class="panel on" id="p0" role="tabpanel">
     <div id="listView">
       <div class="card">
-        <h2>Служащие отдела образования</h2>
         <p class="hint">Сотрудники органа в системе профессионального развития. Категория должности определяет типовую образовательную траекторию. Выберите служащего, чтобы открыть его профиль.</p>
         <div class="searchbar">
           <div class="sfield">Поиск</div>
@@ -178,7 +180,7 @@
           <div class="source"><div class="sl">Обучение и тестирование</div><div class="sv">Учебный портал · Корпоративный университет</div><div class="sd">программы, результаты входного и итогового тестирования</div></div>
           <div class="source"><div class="sl">Оценка применения</div><div class="sv">Непосредственный руководитель</div><div class="sd">отложенная оценка и служебные показатели</div></div>
         </div>
-        <p class="note">Система агрегирует данные через межсистемный обмен. Взаимодействие с федеральной ЕИСУ КС — в объёме, установленном федеральными правилами; региональный контур — в рамках полномочий Санкт-Петербурга.</p>
+        <p class="note">Система агрегирует данные через межсистемный обмен. Взаимодействие с федеральной ЕИСУ КС в объёме, установленном федеральными правилами; региональный в рамках полномочий Санкт-Петербурга.</p>
       </div>
 
       <div class="grid2">
@@ -198,7 +200,7 @@
             <div class="defs" id="defs"></div>
             <div class="actions"><button class="btn sm" onclick="addManual()">Добавить в план</button></div>
           </div>
-          <p class="note">Базовый подбор работает по нормативу: исходя из категории и дефицита по Справочнику подбирается программа. ИИ-персонализация подключается по мере накопления данных. Отдел кадров верифицирует готовую рекомендацию, далее программа включается в план после согласования с руководителем. Основание — ст. 62 ФЗ-79, Закон Санкт-Петербурга № 769-163.</p>
+          <p class="note">Базовый подбор работает по нормативу исходя из категории и дефицита по Справочнику подбирается программа. ИИ-персонализация подключается по мере накопления данных. Отдел кадров верифицирует готовую рекомендацию, далее программа включается в план после согласования с руководителем. Согласно ст. 62 ФЗ-79, Закону Санкт-Петербурга № 769-163.</p>
         </div>
       </div>
     </div>
@@ -334,8 +336,8 @@ function renderTrack(){
     let icon=s.status==="done"?"✓":(s.status==="prog"?"●":"→"),cls=s.status;
     let lab=s.status==="done"?'<span class="stat done">Пройдено</span>':s.status==="prog"?'<span class="stat prog">В процессе</span>':(approved[i]?'<span class="stat appr">✓ Согласовано руководителем · в плане</span>':'<span class="stat rec">Рекомендовано · ожидает согласования руководителя</span>');
     let aitag=s.ai?'<span class="aitag">приоритет уточнён ИИ-персонализацией</span>':'';
-    let rec=s.status==="rec"?`<div class="recact"><span class="recsrc">основание: ${s.src}</span>${approved[i]?'':`<button class="btn sm light" onclick="approve(${i})">Направить на согласование</button>`}</div>${aitag}`:"";
-    let pass=(s.status==="done"&&s.pp)?`<div class="recact"><button class="btn sm light" onclick="openPassport('${s.pp}')">Паспорт результатов →</button></div>`:"";
+    let rec=s.status==="rec"?`<div class="recsrc" style="margin-top:6px">основание: ${s.src}</div>${aitag}${approved[i]?'':`<div class="act-row"><button class="btn act" onclick="approve(${i})">Направить на согласование</button></div>`}`:"";
+    let pass=(s.status==="done"&&s.pp)?`<div class="act-row"><button class="btn act" onclick="openPassport('${s.pp}')">Паспорт результатов →</button></div>`:"";
     box.insertAdjacentHTML('beforeend',`<div class="step"><div class="dot ${cls}">${approved[i]?'✓':icon}</div><div class="sbody"><div class="st">${s.t}</div><div class="sm">${s.m}</div>${lab}${rec}${pass}</div></div>`);
   });
 }
@@ -347,32 +349,32 @@ function pickDef(b,d){pick=d;document.querySelectorAll('.def').forEach(x=>x.setA
 function addManual(){if(!pick){alert('Выберите дефицит');return;}const m=DEFMAP[pick];const T=SLUZH[cur].track;if(T.some(x=>x.t===m.t)){alert('Уже в плане');return;}T.push({t:m.t,m:m.m+" · добавлено вручную",status:"rec",src:"ручной подбор под дефицит «"+pick+"»",ai:false});pick=null;document.querySelectorAll('.def').forEach(x=>x.setAttribute('aria-pressed','false'));renderTrack();}
 
 const PROGRAMS={
-  digital:{name:"Современное госуправление в условиях цифровой трансформации",hours:32,cat:"Экономика. Управление проектами",src:"Корпоративный университет СПб (очная)",avg:31,
+  digital:{name:"Современное госуправление в условиях цифровой трансформации",hours:32,cat:"Экономика. Управление проектами",src:"Корпоративный университет СПб",avg:31,
     comps:[{name:"Управление на основе данных",src:"Справочник · ИКТ",in:42,out:78},{name:"Цифровые сервисы госуправления",src:"проф.-функц.",in:38,out:80},{name:"Оценка цифровых решений",src:"управленческие",in:48,out:72}],
     gapClose:{name:"управление на основе данных",was:25,now:3},
     behavior:{v:"yes",c:"«Применяет при подготовке аналитических справок по сети образовательных учреждений района»."},
     kpi:[{n:"Соблюдение сроков исполнения поручений",b:"84%",a:"93%",up:true},{n:"Оперативность ответов на обращения",b:"6,2 дн.",a:"4,5 дн.",up:true},{n:"Доля поручений с замечаниями",b:"11%",a:"6%",up:true}]},
-  strat:{name:"Стратегическое управление в государственном секторе",hours:20,cat:"Экономика. Управление проектами",src:"Корпоративный университет СПб (дистанц.)",avg:24,
+  strat:{name:"Стратегическое управление в государственном секторе",hours:20,cat:"Экономика. Управление проектами",src:"Корпоративный университет СПб",avg:24,
     comps:[{name:"Стратегическое планирование",src:"Справочник · управленческие",in:55,out:79},{name:"Управление развитием",src:"управленческие",in:50,out:74}],
     gapClose:{name:"стратегическое управление",was:15,now:6},
     behavior:{v:"yes",c:"«Использует при формировании плана развития сети образовательных учреждений района»."},
     kpi:[{n:"Доля достигнутых целевых показателей отдела",b:"71%",a:"83%",up:true},{n:"Качество плановых документов (оценка)",b:"3,8",a:"4,4",up:true}]},
-  lean:{name:"Бережливые технологии в государственном управлении",hours:24,cat:"Экономика. Управление проектами",src:"Корпоративный университет СПб (дистанц.)",avg:18,
+  lean:{name:"Бережливые технологии в государственном управлении",hours:24,cat:"Экономика. Управление проектами",src:"Корпоративный университет СПб",avg:18,
     comps:[{name:"Оптимизация процессов",src:"проф.-функц.",in:50,out:74},{name:"Картирование потоков",src:"аналитические",in:46,out:68}],
     gapClose:{name:"проф.-предметные",was:12,now:5},
     behavior:{v:"yes",c:"«Применил при сокращении сроков согласования документов в отделе»."},
     kpi:[{n:"Длительность типового процесса",b:"12 дн.",a:"8 дн.",up:true},{n:"Объём исполненных поручений",b:"148/кв",a:"165/кв",up:true}]},
-  anticor:{name:"Противодействие коррупции в государственных учреждениях СПб",hours:18,cat:"Противодействие коррупции",src:"Корпоративный университет СПб (дистанц.) · обязательная",avg:6,
+  anticor:{name:"Противодействие коррупции в государственных учреждениях СПб",hours:18,cat:"Противодействие коррупции",src:"Корпоративный университет СПб · обязательная",avg:6,
     comps:[{name:"Коррупционные риски",src:"Справочник · антикор.",in:63,out:69},{name:"Конфликт интересов",src:"ФЗ-273 о ПК",in:60,out:65}],
     gapClose:{name:"антикоррупционные",was:0,now:0},
     behavior:{v:"part",c:"«Знания подтверждены, в текущей деятельности применяются ситуативно»."},
     kpi:[{n:"Декларирование конфликта интересов",b:"в норме",a:"в норме",up:false}]},
-  anticor2:{name:"Основы профилактики коррупции",hours:24,cat:"Противодействие коррупции",src:"Корпоративный университет СПб (дистанц.) · обязательная",avg:7,
+  anticor2:{name:"Основы профилактики коррупции",hours:24,cat:"Противодействие коррупции",src:"Корпоративный университет СПб · обязательная",avg:7,
     comps:[{name:"Профилактика коррупции",src:"Справочник · антикор.",in:60,out:67},{name:"Антикоррупционные стандарты",src:"ФЗ-273 о ПК",in:58,out:64}],
     gapClose:{name:"антикоррупционные",was:0,now:0},
     behavior:{v:"part",c:"«Тема освоена, применяется в рамках должностных обязанностей»."},
     kpi:[{n:"Соблюдение антикоррупционных стандартов",b:"в норме",a:"в норме",up:false}]},
-  rus:{name:"Русский язык в органах власти и учреждениях",hours:18,cat:"Деловая культура",src:"Корпоративный университет СПб (дистанц.)",avg:16,
+  rus:{name:"Русский язык в органах власти и учреждениях",hours:18,cat:"Деловая культура",src:"Корпоративный университет СПб",avg:16,
     comps:[{name:"Грамотность деловой переписки",src:"коммуникативные",in:58,out:78},{name:"Подготовка документов",src:"проф.-функц.",in:55,out:73}],
     gapClose:{name:"грамотность и язык",was:6,now:2},
     behavior:{v:"yes",c:"«Снизилось число замечаний к оформлению служебных документов»."},
